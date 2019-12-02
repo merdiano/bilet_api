@@ -27,7 +27,7 @@ class CategoryController extends Controller
             ->findOrFail($cat_id);
 
         [$order, $data] = $this->sorts_filters($request);
-        $data['category'] = $category;
+//        $data['category'] = $category;
         $data['sub_cats'] = $category->children()
             ->withLiveEvents($order, $data['start'], $data['end'], $category->events_limit)
             ->whereHas('cat_events',
