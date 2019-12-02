@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Event extends  Model
 {
@@ -69,6 +70,22 @@ class Event extends  Model
      */
     public function subCategory(){
         return $this->belongsTo(Category::class,'sub_category_id');
+    }
+
+    public function scopeOnLive($query, $start_date = null, $end_date = null){
+        //if date is null carbon creates now date instance
+        if(isset($start_date) && isset($end_date))
+            $query->where('start_date','<',$end_date)
+                ->where('end_date','>',$start_date);
+        else
+            $query->where('end_date','>',Carbon::now(config('app.timezone')));
+
+        return $query->where('is_live',1)
+            ->withCount(['images as image_url' => function($q){
+                $q->select(DB::raw("image_path as imgurl"))
+                    ->orderBy('created_at','desc')
+                    ->limit(1);
+            }] );
     }
 
 }

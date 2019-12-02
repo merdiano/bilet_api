@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Category;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
@@ -20,12 +21,12 @@ class CategoryController extends Controller
         return response()->json($categories->get());
     }
 
-    public function showCategoryEvents($cat_id){
+    public function showCategoryEvents($cat_id, Request $request){
 
         $category = Category::select('id','title_tk','title_ru','view_type','events_limit','parent_id')
             ->findOrFail($cat_id);
 
-        [$order, $data] = $this->sorts_filters();
+        [$order, $data] = $this->sorts_filters($request);
         $data['category'] = $category;
         $data['sub_cats'] = $category->children()
             ->withLiveEvents($order, $data['start'], $data['end'], $category->events_limit)
@@ -38,10 +39,10 @@ class CategoryController extends Controller
         return response()->json($data);
     }
 
-    private function sorts_filters(){
-        $data['start'] = \request()->get('start') ?? Carbon::today();
-        $data['end'] = \request()->get('end')?? Carbon::today()->endOfCentury();
-        $sort = \request()->get('sort');
+    private function sorts_filters($request){
+        $data['start'] = $request->get('start') ?? Carbon::today();
+        $data['end'] = $request->get('end')?? Carbon::today()->endOfCentury();
+        $sort = $request->get('sort');
 
         if($sort == 'new')
             $orderBy = ['field'=>'created_at','order'=>'desc'];
