@@ -44,7 +44,7 @@ class Category extends Model
             ->with(['events' => function($q) use($limit){
                 $q->select('id','title','description','category_id','sub_category_id','start_date')
                     ->limit($limit)
-                    ->with('starting_ticket')
+//                    ->with('starting_ticket')
                     ->withCount(['stats as views' => function($q){
                         $q->select(DB::raw("SUM(views) as v"));
                     }])
