@@ -17,8 +17,16 @@ $router->get('/', function () use ($router) {
 
 $router->group(['prefix' =>'v1'], function () use ($router){
     $router->get('main','EventController@getMain');
+
     $router->get('categories[/{parent_id}]','CategoryController@get_categories');
+
     $router->get('category/{cat_id}/events','CategoryController@showCategoryEvents');
-    $router->get('sub_category/{cat_id?}/events','CategoryController@showSubCategoryEvents');
+
+    $router->get('sub_category/{cat_id}/events','CategoryController@showSubCategoryEvents');
+
     $router->get('event/{id}/details','EventController@getEvent');
+
+    $router->post('event/{id}/seats','EventController@getEventSeats');
+
+    $router->post('event/{id}/checkout','CheckoutController@postValidateTickets');
 });
