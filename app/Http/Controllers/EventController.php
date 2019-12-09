@@ -29,15 +29,15 @@ class EventController extends Controller
             "start_date",
             "end_date"
         ]);
-        return Carbon::now();
 
-        $tickets = $event->tickets()->select('id','ticket_date')
+        return $tickets = $event->tickets()->select('id','ticket_date')
             ->where('is_hidden', false)
             ->where('ticket_date','>=',Carbon::now())
             ->orderBy('ticket_date', 'asc')
             ->groupBy('ticket_date')
             ->distinct()
             ->get();
+
 
         $ticket_dates = array();
 
