@@ -16,7 +16,7 @@ class EventController extends Controller
     public function getMain(){
         return Category:: main()
             ->whereHas('events')
-            ->categoryLiveEvents(4)
+            ->categoryLiveEvents(10)
             ->get();
 
     }
