@@ -21,8 +21,9 @@ class EventController extends Controller
     }
 
     public function getEvent($id){
-        return $id;
+
         $event = Event::with('images')->findOrFail($id);
+        return $event;
         $now = Carbon::now(config('app.timezone'));
         $tickets = $event->tickets()->select('id','ticket_date')
             ->where('is_hidden', false)
