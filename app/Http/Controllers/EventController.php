@@ -7,7 +7,6 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\Event;
 use App\Models\Ticket;
-use App\Models\Venue;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -22,8 +21,9 @@ class EventController extends Controller
     }
 
     public function getEvent($id){
+        return $id;
         $event = Event::with('images')->findOrFail($id);
-        $now =Carbon::now(config('app.timezone'));
+        $now = Carbon::now(config('app.timezone'));
         $tickets = $event->tickets()->select('id','ticket_date')
             ->where('is_hidden', false)
             ->where('ticket_date','>=',$now)
