@@ -29,6 +29,7 @@ class EventController extends Controller
             "start_date",
             "end_date"
         ]);
+        return Carbon::now();
 
         $tickets = $event->tickets()->select('id','ticket_date')
             ->where('is_hidden', false)
