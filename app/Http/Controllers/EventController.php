@@ -22,12 +22,17 @@ class EventController extends Controller
 
     public function getEvent($id){
 
-        $event = Event::with('images')->findOrFail($id);
-        return $event;
-        $now = Carbon::now(config('app.timezone'));
+        $event = Event::with('images')->findOrFail($id,[
+            "id",
+            "title",
+            "description",
+            "start_date",
+            "end_date"
+        ]);
+
         $tickets = $event->tickets()->select('id','ticket_date')
             ->where('is_hidden', false)
-            ->where('ticket_date','>=',$now)
+            ->where('ticket_date','>=',Carbon::now())
             ->orderBy('ticket_date', 'asc')
             ->groupBy('ticket_date')
             ->distinct()
