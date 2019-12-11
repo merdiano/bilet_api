@@ -23,13 +23,12 @@ class CategoryController extends Controller
 
     public function showCategoryEvents($cat_id, Request $request){
 
-        $category = Category::select('id','title_tk','title_ru','view_type','events_limit','parent_id')
-            ->findOrFail($cat_id);
+        $category = Category::findOrFail($cat_id,['id','title_tk','title_ru']);
 
         [$order, $data] = $this->sorts_filters($request);
 //        $data['category'] = $category;
         $data['sub_cats'] = $category->children()
-            ->withLiveEvents($order, $data['start'], $data['end'], $category->events_limit)
+            ->withLiveEvents($order, $data['start'], $data['end'])
             ->whereHas('cat_events',
                 function ($query) use($data){
                     $query->onLive($data['start'], $data['end']);
@@ -58,8 +57,7 @@ class CategoryController extends Controller
         return [$orderBy, $data];
     }
     public function showSubCategoryEvents($cat_id){
-        $category = Category::select('id','title_tk','title_ru','view_type','events_limit','parent_id')
-            ->findOrFail($cat_id);
+        $category = Category::findOrFail($cat_id,['id','title_tk','title_ru']);
 
         [$order, $data] = $this->sorts_filters();
 
@@ -68,7 +66,7 @@ class CategoryController extends Controller
         $data['events'] = $category->cat_events()
             ->onLive($data['start'],$data['end'])
             ->orderBy($order['field'],$order['order'])
-            ->get();
+            ->paginate();
 
         return response()->json($data);
     }
