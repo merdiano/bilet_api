@@ -56,11 +56,10 @@ class CategoryController extends Controller
         //todo check date formats;
         return [$orderBy, $data];
     }
-    public function showSubCategoryEvents($cat_id){
+    public function showSubCategoryEvents($cat_id, Request $request){
         $category = Category::findOrFail($cat_id,['id','title_tk','title_ru']);
-        return $category;
 
-        [$order, $data] = $this->sorts_filters();
+        [$order, $data] = $this->sorts_filters($request);
 
         $data['category'] = $category;
 
