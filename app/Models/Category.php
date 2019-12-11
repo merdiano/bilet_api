@@ -42,7 +42,7 @@ class Category extends Model
         return $query->select('id','title_tk','title_ru','lft')
             ->orderBy('lft')
             ->with(['events' => function($q) use($limit){
-                $q->select('id','title','description','category_id','sub_category_id','start_date')
+                $q->select('id','title','category_id')
                     ->limit($limit)
 //                    ->with('starting_ticket')
                     ->withCount(['stats as views' => function($q){
