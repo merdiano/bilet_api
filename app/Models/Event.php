@@ -73,6 +73,7 @@ class Event extends  Model
     }
 
     public function scopeOnLive($query, $start_date = null, $end_date = null){
+        $query->select("id","title","description","start_date","end_date","image_url");
         //if date is null carbon creates now date instance
         if(isset($start_date) && isset($end_date))
             $query->where('start_date','<',$end_date)
