@@ -42,8 +42,9 @@ class EventController extends Controller
 
         $ticket_dates = array();
 
+        setlocale(LC_TIME, 'IT_it');
         foreach ($tickets as $ticket){
-            $date = $ticket->ticket_date->format('d M');
+            $date = $ticket->ticket_date->formatLocalized('d M');
             $ticket_dates[$date][] = $ticket;
         }
 
