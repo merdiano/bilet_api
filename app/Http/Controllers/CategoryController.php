@@ -58,6 +58,7 @@ class CategoryController extends Controller
     }
     public function showSubCategoryEvents($cat_id){
         $category = Category::findOrFail($cat_id,['id','title_tk','title_ru']);
+        return $category;
 
         [$order, $data] = $this->sorts_filters();
 
