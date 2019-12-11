@@ -30,8 +30,7 @@ class EventController extends Controller
             "end_date"
         ]);
 
-         $tickets = Ticket::select('id','ticket_date')
-             ->where('event_id',$id)
+         $tickets = $event->tickets()->select('id','ticket_date')
              ->where('is_hidden', false)
              ->where('ticket_date','>=',Carbon::now())
              ->orderBy('ticket_date', 'asc')
