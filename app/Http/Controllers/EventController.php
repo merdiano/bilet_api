@@ -35,7 +35,7 @@ class EventController extends Controller
              ->where('ticket_date','>=',Carbon::now())
              ->orderBy('ticket_date', 'asc')
              ->groupBy('ticket_date')
-             ->distinct()
+//             ->distinct()
              ->get();
 
 
