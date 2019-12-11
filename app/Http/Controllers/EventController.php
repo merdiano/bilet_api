@@ -42,10 +42,8 @@ class EventController extends Controller
 
         $ticket_dates = array();
 
-        Carbon::setLocale('ru');
-        setlocale(LC_TIME, "ru_RU.utf8");
         foreach ($tickets as $ticket){
-            $date = $ticket->ticket_date->format('d M');
+            $date = $ticket->ticket_date->format('d mm');
             $ticket_dates[$date][] = $ticket;
         }
 
