@@ -43,7 +43,7 @@ class EventController extends Controller
         $ticket_dates = array();
 
         foreach ($tickets as $ticket){
-            $date = $ticket->ticket_date->format('d mm');
+            $date = $ticket->ticket_date->format('d.m');
             $ticket_dates[$date][] = $ticket;
         }
 
