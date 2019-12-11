@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 
 
 use App\Models\Category;
+use App\Models\Event;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -23,11 +24,11 @@ class CategoryController extends Controller
 
     public function showCategoryEvents($cat_id, Request $request){
 
-        $category = Category::findOrFail($cat_id,['id','title_tk','title_ru']);
-
         [$order, $data] = $this->sorts_filters($request);
 //        $data['category'] = $category;
-        $data['sub_cats'] = $category->children()
+        $data['sub_cats'] = Category::where('parent_id',$cat_id)
+            ->select('id','title_ru','title_tk','parent_id','lft')
+            ->orderBy('lft')
             ->withLiveEvents($order, $data['start'], $data['end'])
             ->whereHas('cat_events',
                 function ($query) use($data){
@@ -57,17 +58,12 @@ class CategoryController extends Controller
         return [$orderBy, $data];
     }
     public function showSubCategoryEvents($cat_id, Request $request){
-        $category = Category::findOrFail($cat_id,['id','title_tk','title_ru']);
-
         [$order, $data] = $this->sorts_filters($request);
 
-        $data['category'] = $category;
-
-        $data['events'] = $category->cat_events()
+        return Event::where('sub_category_id',$cat_id)
             ->onLive($data['start'],$data['end'])
             ->orderBy($order['field'],$order['order'])
             ->paginate();
 
-        return response()->json($data);
     }
 }
