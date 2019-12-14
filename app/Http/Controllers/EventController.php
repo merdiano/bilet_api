@@ -31,7 +31,7 @@ class EventController extends Controller
                 "end_date"
         ]);
 
-         $tickets = Ticket::select('id','ticket_date')
+         $tickets = Ticket::select('ticket_date')
              ->where('event_id',$id)
              ->where('is_hidden', false)
              ->where('ticket_date','>=',Carbon::now())
@@ -41,16 +41,16 @@ class EventController extends Controller
              ->get();
 
 
-//        $ticket_dates = array();
+        $ticket_dates = array();
 
-//        foreach ($tickets as $ticket){
-//            $date = $ticket->ticket_date->format('d.m');
-//            $ticket_dates[$date][] = $ticket;
-//        }
+        foreach ($tickets as $ticket){
+            $date = $ticket->ticket_date->format('d.m.Y');
+            $ticket_dates[$date][] = $ticket;
+        }
 
         return response()->json([
             'event' => $event,
-            'tickets' =>$tickets->pluck('ticket_date'),
+            'tickets' =>$ticket_dates,
         ]);
     }
 
