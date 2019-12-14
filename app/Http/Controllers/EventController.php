@@ -38,19 +38,20 @@ class EventController extends Controller
              ->orderBy('ticket_date', 'asc')
              ->groupBy('ticket_date')
              ->distinct()
-             ->get();
+             ->get()
+             ->pluck('ticket_date');
 
 
-        $ticket_dates = array();
+//        $ticket_dates = array();
 
-        foreach ($tickets as $ticket){
-            $date = $ticket->ticket_date->format('d.m.Y');
-            $ticket_dates[$date][] = $ticket;
-        }
+//        foreach ($tickets as $ticket){
+//            $date = $ticket->ticket_date->format('d.m');
+//            $ticket_dates[$date][] = $ticket;
+//        }
 
         return response()->json([
             'event' => $event,
-            'tickets' =>$ticket_dates,
+            'tickets' =>$tickets,
         ]);
     }
 
