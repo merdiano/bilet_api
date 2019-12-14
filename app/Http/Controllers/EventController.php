@@ -22,12 +22,13 @@ class EventController extends Controller
 
     public function getEvent($id){
 
-        $event = Event::with('images')->findOrFail($id,[
-            "id",
-            "title",
-            "description",
-            "start_date",
-            "end_date"
+        $event = Event::with('images')
+            ->findOrFail($id,[
+                "id",
+                "title",
+                "description",
+                "start_date",
+                "end_date"
         ]);
 
          $tickets = Ticket::select('id','ticket_date')
