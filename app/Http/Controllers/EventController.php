@@ -40,16 +40,16 @@ class EventController extends Controller
              ->get();
 
 
-        $ticket_dates = array();
+//        $ticket_dates = array();
 
-        foreach ($tickets as $ticket){
-            $date = $ticket->ticket_date->format('d.m');
-            $ticket_dates[$date][] = $ticket;
-        }
+//        foreach ($tickets as $ticket){
+//            $date = $ticket->ticket_date->format('d.m');
+//            $ticket_dates[$date][] = $ticket;
+//        }
 
         return response()->json([
             'event' => $event,
-            'ticket_dates' =>$ticket_dates,
+            'tickets' =>$tickets,
         ]);
     }
 
