@@ -50,7 +50,7 @@ class EventController extends Controller
 
         return response()->json([
             'event' => $event,
-            'tickets' =>$tickets->pluck('ticket_dates'),
+            'tickets' =>$tickets->pluck('ticket_date'),
         ]);
     }
 
