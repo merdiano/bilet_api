@@ -22,8 +22,7 @@ class EventController extends Controller
 
     public function getEvent($id){
 
-        $event = Event::with('images')
-            ->findOrFail($id,[
+        $event = Event::findOrFail($id,[
                 "id",
                 "title",
                 "description",
@@ -42,16 +41,16 @@ class EventController extends Controller
              ->pluck('ticket_date');
 
 
-//        $ticket_dates = array();
+        $ticket_dates = array();
 
-//        foreach ($tickets as $ticket){
-//            $date = $ticket->ticket_date->format('d.m');
-//            $ticket_dates[$date][] = $ticket;
-//        }
+        foreach ($tickets as $ticket){
+            $date = $ticket->ticket_date->format('d.m');
+            $ticket_dates[$date][] = $ticket;
+        }
 
         return response()->json([
             'event' => $event,
-            'tickets' =>$tickets,
+            'tickets' => $ticket_dates,
         ]);
     }
 
@@ -65,6 +64,7 @@ class EventController extends Controller
             ->where('is_hidden', false)
             ->orderBy('sort_order','asc')
             ->get();
+
         return response()->json([
             'venue' => $event->venue,
             'tickets' => $tickets
