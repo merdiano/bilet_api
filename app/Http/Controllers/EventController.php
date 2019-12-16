@@ -37,8 +37,7 @@ class EventController extends Controller
              ->orderBy('ticket_date', 'asc')
              ->groupBy('ticket_date')
              ->distinct()
-             ->get()
-             ->pluck('ticket_date');
+             ->get();
 
 
         $ticket_dates = array();
