@@ -22,6 +22,7 @@ class EventController extends Controller
 
     public function getEvent($id){
 
+        //todo handle if not found
         $event = Event::findOrFail($id,[
                 "id",
                 "title",
@@ -43,7 +44,7 @@ class EventController extends Controller
         $ticket_dates = array();
 
         foreach ($tickets as $ticket){
-            $date = $ticket->ticket_date->format('d.m.Y');
+            $date = $ticket->ticket_date->format('Y-m-d');
             $ticket_dates[$date][] = $ticket;
         }
 
