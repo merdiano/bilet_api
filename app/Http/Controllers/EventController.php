@@ -56,12 +56,15 @@ class EventController extends Controller
 
     public function getEventSeats(Request $request,$event_id){
         $this->validate($request,['ticket_date'=>'required|date']);
-        $event = Event::with('venue')->findOrFail($event_id,['id','venue_id']);
+        $event = Event::with('venue:id,venue_name,seats_image,address,venue_name_ru,venue_name_tk')
+            ->findOrFail($event_id,['id','venue_id']);
 
-        $tickets = Ticket::with(['section','reserved:seat_no,ticket_id','booked:seat_no,ticket_id'])
+        $tickets = Ticket::select('id','title','description',"price", "max_per_person", "min_per_person","start_sale_date","end_sale_date","ticket_date","section_id")
+            ->with(['section','reserved:seat_no,ticket_id','booked:seat_no,ticket_id'])
             ->where('event_id',$event_id)
             ->where('ticket_date',$request->get('ticket_date'))
             ->where('is_hidden', false)
+            ->where('is_paused', false)
             ->orderBy('sort_order','asc')
             ->get();
 
