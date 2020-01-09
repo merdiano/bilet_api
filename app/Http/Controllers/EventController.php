@@ -65,6 +65,12 @@ class EventController extends Controller
             ->orderBy('sort_order','asc')
             ->get();
 
+        if($tickets->count()==0)
+            return response()->json([
+               'status' => 'error',
+               'message' => 'There is no tickets available'
+            ]);
+
         return response()->json([
             'venue' => $event->venue,
             'tickets' => $tickets

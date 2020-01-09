@@ -36,4 +36,50 @@ class Ticket extends Model
         return $this->hasMany(Attendee::class)
             ->orderBy('seat_no','asc');
     }
+
+    /**
+     * Get the booking fee of the ticket.
+     *
+     * @return float|int
+     */
+    public function getBookingFeeAttribute()
+    {
+        return (int)ceil($this->price) === 0 ? 0 : round(
+            ($this->price * (env('ticket_booking_fee_percentage') / 100)) + (env('ticket_booking_fee_fixed')),
+            2
+        );
+    }
+
+    /**
+     * Get the organizer's booking fee.
+     *
+     * @return float|int
+     */
+    public function getOrganiserBookingFeeAttribute()
+    {
+        return (int)ceil($this->price) === 0 ? 0 : round(
+            ($this->price * ($this->event->organiser_fee_percentage / 100)) + ($this->event->organiser_fee_fixed),
+            2
+        );
+    }
+
+    /**
+     * Get the total price of the ticket.
+     *
+     * @return float|int
+     */
+    public function getTotalPriceAttribute()
+    {
+        return $this->getTotalBookingFeeAttribute() + $this->price;
+    }
+
+    /**
+     * Get the total booking fee of the ticket.
+     *
+     * @return float|int
+     */
+    public function getTotalBookingFeeAttribute()
+    {
+        return $this->getBookingFeeAttribute() + $this->getOrganiserBookingFeeAttribute();
+    }
 }

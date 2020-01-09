@@ -29,4 +29,8 @@ $router->group(['prefix' =>'v1'], function () use ($router){
     $router->post('event/{id}/seats','EventController@getEventSeats');
 
     $router->post('event/{id}/checkout','CheckoutController@postValidateTickets');
+
+    $router->post('event/{id}/register_order','CheckoutController@postRegisterOrder');
+
+    $router->post('event/{id}/complete_order','CheckoutController@postCompleteOrder');
 });

@@ -56,6 +56,10 @@ class Event extends  Model
     public function venue(){
         return $this->belongsTo(Venue::class);
     }
+
+    public function reservedTickets(){
+        return $this->hasMany(ReservedTickets::class);
+    }
     /**
      * Category associated with the event
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -72,13 +76,20 @@ class Event extends  Model
         return $this->belongsTo(Category::class,'sub_category_id');
     }
 
+    public function scopeWithReserved($query,$phone_id){
+        return $query->with(['reserved_tickets' => function($q) use ($phone_id){
+            $q->select('id','session_id','ticket_id','event_id','expires')
+                ->where('session_id',$phone_id )
+                ->where('expires','>',Carbon::now())
+                ->whith('ticket:id,price');
+        }]) ;
+    }
+
     public function scopeOnLive($query, $start_date = null, $end_date = null){
         //if date is null carbon creates now date instance
-        if(isset($start_date) && isset($end_date))
+        if(!empty($start_date) && !empty($end_date))
             $query->where('start_date','<',$end_date)
                 ->where('end_date','>',$start_date);
-        else
-            $query->where('end_date','>',Carbon::now(config('app.timezone')));
 
         return $query->where('is_live',1)
             ->withCount(['images as image_url' => function($q){
