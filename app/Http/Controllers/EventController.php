@@ -74,7 +74,7 @@ class EventController extends Controller
         return response()->json([
             'venue' => $event->venue,
             'tickets' => $tickets,
-            'now'=> Carbon::now()
+            'now'=> Carbon::now()->toDateTime()
         ]);
     }
 }
