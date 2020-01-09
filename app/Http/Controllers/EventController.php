@@ -73,7 +73,8 @@ class EventController extends Controller
 
         return response()->json([
             'venue' => $event->venue,
-            'tickets' => $tickets
+            'tickets' => $tickets,
+            'now'=> Carbon::now()
         ]);
     }
 }
