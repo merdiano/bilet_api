@@ -29,7 +29,7 @@ class Ticket extends Model
     {
         return $this->hasMany(ReservedTickets::class)
             ->select('seat_no','ticket_id')
-            ->where('expires','>',Carbon::now())
+            ->whereDate('expires','>',Carbon::now())
             ->orderBy('seat_no','asc');
     }
 
