@@ -28,6 +28,7 @@ class Ticket extends Model
     public function reserved()
     {
         return $this->hasMany(ReservedTickets::class)
+            ->select('seat_no')
             ->where('expires','>',Carbon::now())
             ->orderBy('seat_no','asc');
     }
