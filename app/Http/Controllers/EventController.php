@@ -63,6 +63,8 @@ class EventController extends Controller
             ->with(['section:id,section_no,description,seats,section_no_ru,description_ru,section_no_tk,description_tk','reserved:seat_no,ticket_id','booked:seat_no,ticket_id'])
             ->where('event_id',$event_id)
             ->where('ticket_date',$request->get('ticket_date'))
+            ->where('end_sale_date','>',Carbon::now())
+            ->where('start_sale_date','<',Carbon::now())
             ->where('is_hidden', false)
             ->where('is_paused', false)
             ->orderBy('sort_order','asc')
