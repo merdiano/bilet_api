@@ -61,9 +61,6 @@ class CheckoutController extends Controller
          */
         ReservedTickets::where('session_id', '=', $request->get('phone_id'))->delete();
 
-//        $event = Event::findOrFail($event_id);
-        $seats = $request->get('tickets');
-
         $order_total = 0;
         $booking_fee = 0;
         $organiser_booking_fee = 0;
@@ -71,12 +68,13 @@ class CheckoutController extends Controller
         $reserved = [];
         $tickets = [];
 
-        foreach ($seats as $ticket_id => $ticket_seats) {
-            $seats_count = count($ticket_seats);
+        foreach ($request->get('tickets') as $ticket) {
+            $ticket_id = $ticket['ticket_id'];
+            $seats_count = count($ticket['seats']);
             if($seats_count<1)
                 continue;
 
-            $seat_nos = array_values($ticket_seats);
+            $seat_nos = $ticket['seats'];
             $reserved_tickets = ReservedTickets::where('ticket_id',$ticket_id)
                 ->where('expires','>',Carbon::now())
                 ->whereIn('seat_no',$seat_nos)
@@ -93,17 +91,17 @@ class CheckoutController extends Controller
                     'messages' => 'Your selected seats are already reserved or booked please choose other seats',//todo show which are reserved
                 ]);
 
-            $ticket = Ticket::with('event:id,organiser_fee_fixed,organiser_fee_percentage')
+            $eventTicket = Ticket::with('event:id,organiser_fee_fixed,organiser_fee_percentage')
                 ->findOrFail($ticket_id);
 
-            $max_per_person = min($ticket->quantity_remaining, $ticket->max_per_person);
+            $max_per_person = min($eventTicket->quantity_remaining, $eventTicket->max_per_person);
             /*
              * Validation max min ticket count
              */
-            if($seats_count < $ticket->min_per_person){
-                $message = 'You must select at least ' . $ticket->min_per_person . ' tickets.';
+            if($seats_count < $eventTicket->min_per_person){
+                $message = 'You must select at least ' . $eventTicket->min_per_person . ' tickets.';
             }elseif ($seats_count > $max_per_person){
-                $message = 'The maximum number of tickets you can register is ' . $ticket->quantity_remaining;
+                $message = 'The maximum number of tickets you can register is ' . $eventTicket->quantity_remaining;
             }
 
             if (isset($message)) {
@@ -114,20 +112,20 @@ class CheckoutController extends Controller
             }
 
             $total_ticket_quantity += $seats_count;
-            $order_total += ($seats_count * $ticket->price);
-            $booking_fee += ($seats_count * $ticket->booking_fee);
-            $organiser_booking_fee += ($seats_count * $ticket->organiser_booking_fee);
+            $order_total += ($seats_count * $eventTicket->price);
+            $booking_fee += ($seats_count * $eventTicket->booking_fee);
+            $organiser_booking_fee += ($seats_count * $eventTicket->organiser_booking_fee);
             $tickets[] = [
-                'ticket_id'                => $ticket->id,
+                'ticket_id'             => $ticket_id,
                 'qty'                   => $seats_count,
-                'seats'                 => $ticket_seats,
-                'price'                 => ($seats_count * $ticket->price),
-                'booking_fee'           => ($seats_count * $ticket->booking_fee),
-                'organiser_booking_fee' => ($seats_count * $ticket->organiser_booking_fee),
-                'full_price'            => $ticket->price + $ticket->total_booking_fee,
+                'seats'                 => $seat_nos,
+                'price'                 => ($seats_count * $eventTicket->price),
+                'booking_fee'           => ($seats_count * $eventTicket->booking_fee),
+                'organiser_booking_fee' => ($seats_count * $eventTicket->organiser_booking_fee),
+                'full_price'            => $eventTicket->price + $eventTicket->total_booking_fee,
             ];
 
-            foreach ($ticket_seats as $seat_no) {
+            foreach ($seat_nos as $seat_no) {
                 $reservedTickets = new ReservedTickets();
                 $reservedTickets->ticket_id = $ticket_id;
                 $reservedTickets->event_id = $event_id;
@@ -141,13 +139,6 @@ class CheckoutController extends Controller
         }
 
         ReservedTickets::insert($reserved);
-
-        if (empty($tickets)) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'No tickets selected.',
-            ]);
-        }
 
         return response()->json([
 
