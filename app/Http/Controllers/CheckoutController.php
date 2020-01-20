@@ -6,7 +6,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Attendee;
 use App\Models\Event;
+use App\Models\EventStats;
 use App\Models\Order;
+use App\Models\OrderItem;
+use App\Models\QuestionAnswer;
 use App\Models\ReservedTickets;
 use App\Models\Ticket;
 use App\Payment\CardPayment;
@@ -34,7 +37,7 @@ class CheckoutController extends Controller
     }
 
     public function postValidateTickets($event_id, Request $request){
-        if (!$request->has('seats')) {
+        if (!$request->has('tickets')) {
             return response()->json([
                 'status'  => 'error',
                 'message' => 'No seats selected',
@@ -59,7 +62,7 @@ class CheckoutController extends Controller
         ReservedTickets::where('session_id', '=', $request->get('phone_id'))->delete();
 
 //        $event = Event::findOrFail($event_id);
-        $seats = $request->get('seats');
+        $seats = $request->get('tickets');
 
         $order_total = 0;
         $booking_fee = 0;
@@ -68,7 +71,7 @@ class CheckoutController extends Controller
         $reserved = [];
         $tickets = [];
 
-        foreach ($seats as $ticket_id=>$ticket_seats) {
+        foreach ($seats as $ticket_id => $ticket_seats) {
             $seats_count = count($ticket_seats);
             if($seats_count<1)
                 continue;
@@ -87,7 +90,7 @@ class CheckoutController extends Controller
             if(count($reserved_tickets)>0 || count($booked_tickets)>0)
                 return response()->json([
                     'status'   => 'error',
-                    'messages' => 'Some of selected seats are already reserved',//todo show which are reserved
+                    'messages' => 'Your selected seats are already reserved or booked please choose other seats',//todo show which are reserved
                 ]);
 
             $ticket = Ticket::with('event:id,organiser_fee_fixed,organiser_fee_percentage')
@@ -148,8 +151,8 @@ class CheckoutController extends Controller
 
         return response()->json([
 
-            'event_id'                => $event_id,
-            'tickets'                 => $tickets,
+//            'event_id'                => $event_id,
+//            'tickets'                 => $tickets,
             'total_ticket_quantity'   => $total_ticket_quantity,
             'order_started'           => time(),
             'expires'                 => $order_expires_time,
@@ -164,8 +167,8 @@ class CheckoutController extends Controller
     public function postRegisterOrder(Request $request, $event_id){
         $phone_id = $request->get('phone_id');
         $holder_name = $request->get('name');
-        $holder_surname = $request->get('name');
-        $holder_email = $request->get('name');
+        $holder_surname = $request->get('surname');
+        $holder_email = $request->get('email');
 
         //todo validation
 
@@ -184,19 +187,20 @@ class CheckoutController extends Controller
         $booking_fee = 0;
         $organiser_booking_fee = 0;
 
-        DB::beginTransaction();
+//        DB::beginTransaction();
+
         foreach ($event->reserved_tickets as $reserve){
             $order_total += $reserve->ticket->price;
             $booking_fee += $reserve->ticket->booking_fee;
             $organiser_booking_fee += $reserve->ticket->organiser_booking_fee;
             $total_booking_fee += $reserve->ticket->total_booking_fee;
 
-            $reserve->holder_name = $holder_name;
-            $reserve->holder_surname = $holder_surname;
-            $reserve->holder_email = $holder_email;
-            $reserve->save();
+//            $reserve->holder_name = $holder_name;
+//            $reserve->holder_surname = $holder_surname;
+//            $reserve->holder_email = $holder_email;
+//            $reserve->save();
         }
-        DB::commit();
+//        DB::commit();
 
         $orderService = new OrderService($order_total, $total_booking_fee, $event);
         $orderService->calculateFinalCosts();
@@ -227,10 +231,26 @@ class CheckoutController extends Controller
                  * As we're going off-site for payment we need to store some data in a session so it's available
                  * when we return
                  */
-
+                $order = new Order();
+                $order->first_name = ($holder_name);//todo sanitize etmelimi?
+                $order->last_name = ($holder_surname);
+                $order->email = ($holder_email);
+                $order->order_status_id = 5;//order awaiting payment
+                $order->amount = $order_total;
+                $order->booking_fee = $booking_fee;
+                $order->organiser_booking_fee = $organiser_booking_fee;
+                $order->discount = 0.00;
+                $order->account_id = $event->account->id;
+                $order->event_id = $event_id;
+                $order->is_payment_received = 0;//false
+                $order->taxamt = $orderService->getTaxAmount();
+                $order->session_id = $phone_id;
+                $order->transaction_id = $response->getPaymentReferenceId();
+                $order->order_date = Carbon::now();
+                $order->save();
                 $return = [
                     'status'       => 'success',
-                    'orderId'  => $response->getPaymentReferenceId(),
+                    'order'  => $order,
                 ];
 
             } else {
@@ -255,30 +275,132 @@ class CheckoutController extends Controller
 
     public function postCompleteOrder(Request $request, $event_id){
         $orderId = $request->get('orderId');
-        $pone_id = $request->get('phone_id');
-        //todo check order status then complete order
 
         try{
             $response = $this->gateway->getPaymentStatus($orderId);
 
             if ($response->isSuccessfull()) {
 
-                return $this->completeOrder($event_id, false);
+                return $this->completeOrder($event_id,$request);
             } else {
-                session()->flash('message', $response->errorMessage());
+
                 return response()->json([
                     'status'          => 'error',
                     'message' => $response->errorMessage(),
                 ]);
             }
         }catch (\Exception $ex){
-
+            return response()->json([
+                'status'          => 'error',
+                'message' => $ex->getMessage(),
+            ]);
         }
 
-
     }
 
-    public function postCancellReserveration(Request $request){
-        $phone_id = $request->get('phone_id');
+    private function completeOrder($event_id, $request){
+        DB::beginTransaction();
+
+        try {
+
+
+            $order = Order::select('amount', 'booking_fee', 'orgenizer_booking_fee', 'taxamt', 'first_name', 'last_name', 'email')
+                ->where('event_id', $event_id)
+                ->where('session_id', $request['phone_id'])
+                ->where('transaction_id', $request['order_id'])
+                ->first();
+
+            $grand_total = $order->amount + $order->booking_fee + $order->orgenizer_booking_fee + $order->taxamt;
+
+            /*
+             * Update the event sales volume
+             */
+            $event = Event::findOrfail($event_id, ['id', 'sales_volume', 'organiser_fees_volume']);
+            $event->increment('sales_volume', $grand_total);
+            $event->increment('organiser_fees_volume', $order->organiser_booking_fee);
+
+            $reserved_tickets = ReservedTickets::select('id', 'seat_no', 'ticket_id')
+                ->with(['ticket:id,quantity_sold,sales_volume,organiser_fees_volume,price,organiser_booking_fee'])
+                ->where('session_id', $request['phone_id'])
+                ->where('event_id', $event_id)
+                ->get();
+            /*
+             * Update the event stats
+             */
+            $event_stats = EventStats::updateOrCreate([
+                'event_id' => $event_id,
+                'date' => DB::raw('CURRENT_DATE'),
+            ]);
+
+            $event_stats->increment('tickets_sold', $reserved_tickets->count() ?? 0);
+            $event_stats->increment('sales_volume', $order->amount);
+            $event_stats->increment('organiser_fees_volume', $order->organiser_booking_fee);
+            $attendee_increment = 1;
+            /*
+             * Add the attendees
+             */
+
+            foreach ($reserved_tickets as $reserved) {
+
+                $ticket = $reserved->ticket;
+
+                /*
+                 * Update some ticket info
+                 */
+                $ticket->increment('quantity_sold', $reserved->quantity);//$reserved->quantity_reserved);
+                $ticket->increment('sales_volume', $ticket->price);
+                $ticket->increment('organiser_fees_volume', $ticket->orgniser_booking_fee);// * $reserved->quantity_reserved
+
+                /*
+                 * Insert order items (for use in generating invoices)
+                 */
+                $orderItem = new OrderItem();
+                $orderItem->title = $ticket->title;
+                $orderItem->quantity = 1;
+                $orderItem->order_id = $order->id;
+                $orderItem->unit_price = $ticket->price;
+                $orderItem->unit_booking_fee = $ticket->booking_fee + $ticket->organiser_booking_fee;
+                $orderItem->save();
+
+                /*
+                 * Create the attendees
+                 */
+                $attendee = new Attendee();
+                $attendee->first_name = $order->first_name;
+                $attendee->last_name = $order->last_name;
+                $attendee->email = $order->email;
+                $attendee->event_id = $event_id;
+                $attendee->order_id = $order->id;
+                $attendee->ticket_id = $reserved->ticket_id;
+                $attendee->account_id = $event->account->id;
+                $attendee->reference_index = $attendee_increment;
+                $attendee->seat_no = $reserved->seat_no;
+                $attendee->save();
+
+                /* Keep track of total number of attendees */
+                $attendee_increment++;
+            }
+
+
+            DB::commit();
+        }
+        catch (\Exception $ex){
+
+            Log::error($ex);
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Whoops! There was a problem processing your order. Please try again.'
+            ]);
+        }
+
+        /*
+         * Remove any tickets the user has reserved after they have been ordered for the user
+         */
+        ReservedTickets::where('session_id', $request->get('phone_id'))->delete();
+
+        //todo fire event
     }
+
 }
