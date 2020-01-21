@@ -24,17 +24,17 @@ class CheckoutController extends Controller
      * Payment gateway
      * @var CardPayment
      */
-    protected $gateway;
-
-    /**
-     * EventCheckoutController constructor.
-     * @param Request $request
-     */
-    public function __construct(Request $request, CardPayment $gateway)
-    {
-
-        $this->gateway = $gateway;
-    }
+//    protected $gateway;
+//
+//    /**
+//     * EventCheckoutController constructor.
+//     * @param Request $request
+//     */
+//    public function __construct(Request $request, CardPayment $gateway)
+//    {
+//
+//        $this->gateway = $gateway;
+//    }
 
     public function postValidateTickets($event_id, Request $request){
         if (!$request->has('tickets')) {
@@ -155,7 +155,7 @@ class CheckoutController extends Controller
         ]);
     }
 
-    public function postRegisterOrder(Request $request, $event_id){
+    public function postRegisterOrder(CardPayment $gateway,Request $request, $event_id){
         $phone_id = $request->get('phone_id');
         $holder_name = $request->get('name');
         $holder_surname = $request->get('surname');
@@ -215,7 +215,7 @@ class CheckoutController extends Controller
 
         ];
         try{
-            $response = $this->gateway->registerPayment($transaction_data);
+            $response = $gateway->registerPayment($transaction_data);
 
             if($response->isSuccessfull()){
                 /*
