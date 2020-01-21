@@ -68,6 +68,7 @@ class CheckoutController extends Controller
         $reserved = [];
         $tickets = [];
         $selectedSeats = json_decode($request->get('tickets'),true);
+        dd($selectedSeats);
 
         foreach ($selectedSeats as $ticket) {
             $ticket_id = $ticket['ticket_id'];
