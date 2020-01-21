@@ -133,7 +133,7 @@ class CheckoutController extends Controller
                 $reservedTickets->event_id = $event_id;
                 $reservedTickets->quantity_reserved = 1;
                 $reservedTickets->expires = $order_expires_time;
-                $reservedTickets->session_id = $request->has('phone_id';
+                $reservedTickets->session_id = $request->has('phone_id');
                 $reservedTickets->seat_no = $seat_no;
                 $reserved[] = $reservedTickets->attributesToArray();
             }
