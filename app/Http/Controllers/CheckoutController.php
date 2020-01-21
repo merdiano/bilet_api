@@ -96,6 +96,8 @@ class CheckoutController extends Controller
             $eventTicket = Ticket::with('event:id,organiser_fee_fixed,organiser_fee_percentage')
                 ->findOrFail($ticket_id);
 
+            dd($eventTicket->booking_fee);
+
             $max_per_person = min($eventTicket->quantity_remaining, $eventTicket->max_per_person);
             /*
              * Validation max min ticket count
