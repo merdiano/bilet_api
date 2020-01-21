@@ -36,7 +36,7 @@ class CheckoutController extends Controller
 //        $this->gateway = $gateway;
 //    }
 
-    public function postValidateTickets( Request $request,$event_id){
+    public function postReserveTickets( Request $request,$event_id){
         if (!$request->has('tickets')) {
             return response()->json([
                 'status'  => 'error',
@@ -67,8 +67,9 @@ class CheckoutController extends Controller
         $total_ticket_quantity = 0;
         $reserved = [];
         $tickets = [];
+        $selectedSeats = json_decode($request->get('tickets'),true);
 
-        foreach ($request->get('tickets') as $ticket) {
+        foreach ($selectedSeats as $ticket) {
             $ticket_id = $ticket['ticket_id'];
             $seats_count = count($ticket['seats']);
             if($seats_count<1)
