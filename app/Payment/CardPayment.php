@@ -17,12 +17,22 @@ class CardPayment{
 
     public function __construct()
     {
-        $this->client = new Client(config('payment.card.config'));
+        $this->client = new Client([
+            'base_uri' => env('PAYMENT_API_URI'),
+            'timeout' => 10,
+            'connect_timeout' => 10,
+            'verify' => true,
+            'http_errors' => false,
+        ]);
     }
 
     public function registerPayment($transaction_data){
 
-        $params['form_params'] = array_merge($transaction_data,config('payment.card.params'));
+        $params['form_params'] = array_merge($transaction_data,[
+            'userName' => env('PAYMENT_API_USER'),
+            'password' => env('PAYMENT_API_PASSWORD'),
+            'language' => 'ru',
+        ]);
         $response = new PaymentRegistrationResponse();
         //dd($params);
         try{
