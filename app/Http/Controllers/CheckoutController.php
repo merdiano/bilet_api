@@ -36,7 +36,7 @@ class CheckoutController extends Controller
 //        $this->gateway = $gateway;
 //    }
 
-    public function postValidateTickets($event_id, Request $request){
+    public function postValidateTickets( Request $request,$event_id){
         if (!$request->has('tickets')) {
             return response()->json([
                 'status'  => 'error',
