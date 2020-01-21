@@ -6,6 +6,7 @@ namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Ticket extends Model
 {
@@ -81,5 +82,34 @@ class Ticket extends Model
     public function getTotalBookingFeeAttribute()
     {
         return $this->getBookingFeeAttribute() + $this->getOrganiserBookingFeeAttribute();
+    }
+
+    /**
+     * Get the number of tickets remaining.
+     *
+     * @return \Illuminate\Support\Collection|int|mixed|static
+     */
+    public function getQuantityRemainingAttribute()
+    {
+        if (is_null($this->quantity_available)) {
+            return 9999; //Better way to do this?
+        }
+
+        return $this->quantity_available - ($this->quantity_sold + $this->quantity_reserved);
+    }
+
+    /**
+     * Get the number of tickets reserved.
+     *
+     * @return mixed
+     */
+    public function getQuantityReservedAttribute()
+    {
+        $reserved_total = DB::table('reserved_tickets')
+            ->where('ticket_id', $this->id)
+            ->where('expires', '>', Carbon::now())
+            ->sum('quantity_reserved');
+
+        return $reserved_total;
     }
 }

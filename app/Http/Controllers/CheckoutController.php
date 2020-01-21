@@ -103,7 +103,7 @@ class CheckoutController extends Controller
             if($seats_count < $eventTicket->min_per_person){
                 $message = 'You must select at least ' . $eventTicket->min_per_person . ' tickets.';
             }elseif ($seats_count > $max_per_person){
-                $message = 'The maximum number of tickets you can register is ' . $eventTicket->quantity_remaining;
+                $message = 'The maximum number of tickets you can register is ' . $max_per_person;
             }
 
             if (isset($message)) {
