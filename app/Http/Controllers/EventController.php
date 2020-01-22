@@ -83,7 +83,7 @@ class EventController extends Controller
     public function getVendorEvents(Request $request){
         return $request->auth->events()
             ->select('id','title','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
-            ->with('views')
+            ->WithViews()
             ->withCount(['images as image_url' => function($q){
                 $q->select(DB::raw("image_path as imgurl"))
                     ->orderBy('created_at','desc')
@@ -94,8 +94,9 @@ class EventController extends Controller
     }
 
     public function getVendorEvent(Request $request,$event_id){
-        return Event::with(['ticket_dates','views'])
+        return Event::with('ticket_dates')
             ->select("id", 'start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
+            ->WithViews()
             ->withCount(['images as image_url' => function($q){
                 $q->select(DB::raw("image_path as imgurl"))
                     ->orderBy('created_at','desc')

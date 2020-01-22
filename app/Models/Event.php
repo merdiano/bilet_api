@@ -63,6 +63,14 @@ class Event extends  Model
     public function views(){
         return $this->stats()->sum('views');
     }
+
+    public function scopeWithViews($query)
+    {
+        return $query->withCount(['stats as views' => function ($query) {
+            $query->select(DB::raw('sum(views)'));
+        }]);
+    }
+
     public function venue(){
         return $this->belongsTo(Venue::class);
     }
