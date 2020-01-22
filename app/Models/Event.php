@@ -31,6 +31,14 @@ class Event extends  Model
     {
         return $this->hasMany(\App\Models\Ticket::class);
     }
+    public function ticket_dates(){
+        return $this->hasMany(\App\Models\Ticket::class)
+            ->where('is_hidden', false)
+            ->where('ticket_date','>=',Carbon::now())
+            ->orderBy('ticket_date', 'asc')
+            ->groupBy('ticket_date')
+            ->distinct();
+    }
 
     public function starting_ticket(){
         return $this->tickets()

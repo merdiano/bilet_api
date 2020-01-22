@@ -29,21 +29,12 @@ class EventController extends Controller
                 "description",
                 "start_date",
                 "end_date"
-        ]);
-
-         $tickets = Ticket::select('ticket_date')
-             ->where('event_id',$id)
-             ->where('is_hidden', false)
-             ->where('ticket_date','>=',Carbon::now())
-             ->orderBy('ticket_date', 'asc')
-             ->groupBy('ticket_date')
-             ->distinct()
-             ->get();
+        ])->with('ticket_dates');
 
 
         $ticket_dates = array();
 
-        foreach ($tickets as $ticket){
+        foreach ($event->ticket_dates as $ticket){
             $date = $ticket->ticket_date->format('Y-m-d');
             $ticket_dates[$date][] = $ticket;
         }
@@ -87,6 +78,14 @@ class EventController extends Controller
     }
 
     public function getVendorEvents(Request $request){
-        return $request->auth->events()->orderBy('id','DESC')->paginate(10);
+        return $request->auth->events()
+            ->select('id','title','start_date','end_date',"user_id","sales_volume","organiser_fees_volume","is_live")
+            ->withCount(['images as image_url' => function($q){
+                $q->select(DB::raw("image_path as imgurl"))
+                    ->orderBy('created_at','desc')
+                    ->limit(1);
+            }] )
+            ->orderBy('id','DESC')
+            ->paginate(10);
     }
 }
