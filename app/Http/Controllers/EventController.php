@@ -81,4 +81,12 @@ class EventController extends Controller
             'tickets' => $tickets
         ]);
     }
+
+    public function search(Request $request){
+        $key = $request->get('key');
+    }
+
+    public function getVendorEvents(){
+
+    }
 }

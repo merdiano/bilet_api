@@ -147,17 +147,15 @@ class CheckoutController extends Controller
 //            'event_id'                => $event_id,
 //            'tickets'                 => $tickets,
             'total_ticket_quantity'   => $total_ticket_quantity,
-            'order_started'           => time(),
-            'expires'                 => $order_expires_time,
+            'order_started'           => Carbon::now(),
+            'expires'                 => env('CHECKOUT_TIMEOUT'),
             'order_total'             => $order_total,
             'booking_fee'             => $booking_fee,
             'organiser_booking_fee'   => $organiser_booking_fee,
-            'total_booking_fee'       => $booking_fee + $organiser_booking_fee,
-
         ]);
     }
 
-    public function postRegisterOrder(CardPayment $gateway,Request $request, $event_id){
+    public function postRegisterOrder(Request $request, $event_id,CardPayment $gateway){
         $phone_id = $request->get('phone_id');
         $holder_name = $request->get('name');
         $holder_surname = $request->get('surname');
@@ -266,11 +264,11 @@ class CheckoutController extends Controller
         return response()->json($return);
     }
 
-    public function postCompleteOrder(Request $request, $event_id){
+    public function postCompleteOrder(Request $request, $event_id,CardPayment $gateway){
         $orderId = $request->get('orderId');
 
         try{
-            $response = $this->gateway->getPaymentStatus($orderId);
+            $response = $gateway->getPaymentStatus($orderId);
 
             if ($response->isSuccessfull()) {
 
@@ -295,7 +293,6 @@ class CheckoutController extends Controller
         DB::beginTransaction();
 
         try {
-
 
             $order = Order::select('amount', 'booking_fee', 'orgenizer_booking_fee', 'taxamt', 'first_name', 'last_name', 'email')
                 ->where('event_id', $event_id)
