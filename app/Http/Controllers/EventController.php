@@ -82,7 +82,8 @@ class EventController extends Controller
 
     public function getVendorEvents(Request $request){
         return $request->auth->events()
-            ->select('id','title')
+            ->select('id','title','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
+            ->with('views')
             ->withCount(['images as image_url' => function($q){
                 $q->select(DB::raw("image_path as imgurl"))
                     ->orderBy('created_at','desc')
@@ -101,6 +102,7 @@ class EventController extends Controller
                     ->limit(1);
             }] )
             ->where('id',$event_id)
-            ->where('user_id',$request->auth->id)->first();
+            ->where('user_id',$request->auth->id)
+            ->first();
     }
 }
