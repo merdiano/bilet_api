@@ -34,7 +34,7 @@ class Event extends  Model
 
     public function ticket_dates(){
         return $this->hasMany(\App\Models\Ticket::class)
-            ->select('ticket_date')
+            ->select('ticket_date','event_id')
             ->where('is_hidden', false)
             ->where('ticket_date','>=',Carbon::now())
             ->orderBy('ticket_date', 'asc')

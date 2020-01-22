@@ -39,7 +39,7 @@ class EventController extends Controller
             $date = $ticket->ticket_date->format('Y-m-d');
             $ticket_dates[$date][] = $ticket;
         }
-
+        $event->ticket_dates = null;
         return response()->json([
             'event' => $event,
             'tickets' => $ticket_dates,
