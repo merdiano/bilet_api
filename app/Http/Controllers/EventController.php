@@ -9,7 +9,7 @@ use App\Models\Event;
 use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-
+use Illuminate\Support\Facades\DB;
 class EventController extends Controller
 {
     public function getMain(){
