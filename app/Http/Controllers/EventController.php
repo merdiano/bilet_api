@@ -9,6 +9,7 @@ use App\Models\Event;
 use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Auth;
 
 class EventController extends Controller
 {
