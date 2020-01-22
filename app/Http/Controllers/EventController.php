@@ -23,7 +23,7 @@ class EventController extends Controller
     public function getEvent($id){
 
         //todo handle if not found
-        $event = Event::with('ticket_dates')
+        $event = Event::with(['ticket_dates','views'])
             ->findOrFail($id,[
                 "id",
                 "title",
@@ -39,9 +39,11 @@ class EventController extends Controller
             $date = $ticket->ticket_date->format('Y-m-d');
             $ticket_dates[$date][] = $ticket;
         }
-        $event->ticket_dates = null;
+
         return response()->json([
-            'event' => $event,
+            'event' => $event->except([
+                "ticket_dates",
+            ]),
             'tickets' => $ticket_dates,
         ]);
     }
@@ -80,7 +82,7 @@ class EventController extends Controller
 
     public function getVendorEvents(Request $request){
         return $request->auth->events()
-            ->select('id','title','start_date','end_date',"user_id","sales_volume","organiser_fees_volume","is_live")
+            ->select('id','title')
             ->withCount(['images as image_url' => function($q){
                 $q->select(DB::raw("image_path as imgurl"))
                     ->orderBy('created_at','desc')
@@ -88,5 +90,17 @@ class EventController extends Controller
             }] )
             ->orderBy('id','DESC')
             ->paginate(10);
+    }
+
+    public function getVendorEvent(Request $request,$event_id){
+        return Event::with(['ticket_dates','views'])
+            ->select("id", 'start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
+            ->withCount(['images as image_url' => function($q){
+                $q->select(DB::raw("image_path as imgurl"))
+                    ->orderBy('created_at','desc')
+                    ->limit(1);
+            }] )
+            ->where('id',$event_id)
+            ->where('user_id',$request->auth->id)->first();
     }
 }

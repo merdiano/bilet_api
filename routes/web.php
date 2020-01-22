@@ -41,5 +41,6 @@ $router->group(
     ['middleware' => 'jwt.auth','prefix'=>'vendor'],
     function() use ($router) {
         $router->get('events', 'EventController@getVendorEvents');
+        $router->get('event/{id}/details', 'EventController@getVendorEvent');
     }
 );
