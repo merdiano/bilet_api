@@ -87,7 +87,8 @@ class EventController extends Controller
         $key = $request->get('key');
     }
 
-    public function getVendorEvents(){
+    public function getVendorEvents(Request $request){
+        dd(Auth::user(),$request->auth);
         return Auth::user()->events()->orderBy('id','DESC')->paginate(10);
     }
 }

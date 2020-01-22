@@ -7,7 +7,6 @@ use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Database\Eloquent\Model;
 use Laravel\Lumen\Auth\Authorizable;
-use App\Models\Event;
 
 class User extends Model implements AuthenticatableContract, AuthorizableContract
 {
@@ -32,6 +31,6 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     ];
 
     public function events(){
-        return $this->hasMany(Event::class);
+        return $this->hasMany( App\Models\Event::class);
     }
 }
