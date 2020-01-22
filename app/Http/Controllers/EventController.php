@@ -9,7 +9,6 @@ use App\Models\Event;
 use App\Models\Ticket;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
-use Auth;
 
 class EventController extends Controller
 {
@@ -88,7 +87,6 @@ class EventController extends Controller
     }
 
     public function getVendorEvents(Request $request){
-        dd(Auth::user(),$request->auth);
-        return Auth::user()->events()->orderBy('id','DESC')->paginate(10);
+        return $request->auth->events()->orderBy('id','DESC')->paginate(10);
     }
 }
