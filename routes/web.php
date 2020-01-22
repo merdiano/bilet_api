@@ -35,19 +35,11 @@ $router->group(['prefix' =>'v1'], function () use ($router){
     $router->post('event/{id}/checkout','CheckoutController@postCompleteOrder');
 });
 
-$router->post(
-    'auth/login',
-    [
-        'uses' => 'AuthController@authenticate'
-    ]
-);
+$router->post('auth/login', 'AuthController@authenticate');
 
 $router->group(
-    ['middleware' => 'jwt.auth'],
+    ['middleware' => 'jwt.auth','prefix'=>'vendor'],
     function() use ($router) {
-        $router->get('users', function() {
-            $users = \App\User::all();
-            return response()->json($users);
-        });
+        $router->get('events', 'EventController@getVendorEvents');
     }
 );

@@ -87,6 +87,6 @@ class EventController extends Controller
     }
 
     public function getVendorEvents(){
-
+        return Auth::user()->events()->orderBy('id','DESC')->paginate(10);
     }
 }
