@@ -23,13 +23,14 @@ class EventController extends Controller
     public function getEvent($id){
 
         //todo handle if not found
-        $event = Event::findOrFail($id,[
+        $event = Event::with('ticket_dates')
+            ->findOrFail($id,[
                 "id",
                 "title",
                 "description",
                 "start_date",
                 "end_date"
-        ])->with('ticket_dates');
+        ]);
 
 
         $ticket_dates = array();

@@ -31,6 +31,7 @@ class Event extends  Model
     {
         return $this->hasMany(\App\Models\Ticket::class);
     }
+
     public function ticket_dates(){
         return $this->hasMany(\App\Models\Ticket::class)
             ->where('is_hidden', false)
