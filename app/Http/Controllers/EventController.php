@@ -25,13 +25,14 @@ class EventController extends Controller
         //todo handle if not found
         $event = Event::with('ticket_dates')
             ->WithViews()
-            ->findOrFail($id,[
+            ->where('id',$id)
+            ->select(
                 "id",
                 "title",
                 "description",
                 "start_date",
-                "end_date"
-        ]);
+                "end_date")
+            ->first();
 
 
         $ticket_dates = array();
