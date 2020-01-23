@@ -146,7 +146,7 @@ class CheckoutController extends Controller
             ReservedTickets::insert($reserved);
 
             return response()->json([
-
+                'status' => 'success',
 //            'event_id'                => $event_id,
 //            'tickets'                 => $tickets,
                 'total_ticket_quantity' => $total_ticket_quantity,
