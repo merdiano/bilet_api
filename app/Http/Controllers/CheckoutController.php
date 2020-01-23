@@ -165,7 +165,9 @@ class CheckoutController extends Controller
         }
     }
 
-    public function postRegisterOrder(Request $request, $event_id,CardPayment $gateway){
+    public function postRegisterOrder(Request $request, $event_id){
+
+        $gateway = new CardPayment();
 
         $validator = Validator::make($request->all(),
             [
