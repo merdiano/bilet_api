@@ -37,122 +37,132 @@ class CheckoutController extends Controller
 //    }
 
     public function postReserveTickets( Request $request,$event_id){
-        if (!$request->has('tickets')) {
-            return response()->json([
-                'status'  => 'error',
-                'message' => 'No seats selected',
-            ]);
-        }
+        try {
 
-        if(!$request->has('phone_id')){
-            return reset()->json([
-               'status' => 'error',
-               'message' => 'Phone id required'
-            ]);
-        }
 
-        /*
-        * Order expires after X min
-        */
-        $order_expires_time = Carbon::now()->addMinutes(env('CHECKOUT_TIMEOUT'));
+            if (!$request->has('tickets')) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'No seats selected',
+                ]);
+            }
 
-        /*
-         * Remove any tickets the user has reserved
-         */
-        ReservedTickets::where('session_id', '=', $request->get('phone_id'))->delete();
+            if (!$request->has('phone_id')) {
+                return reset()->json([
+                    'status' => 'error',
+                    'message' => 'Phone id required'
+                ]);
+            }
 
-        $order_total = 0;
-        $booking_fee = 0;
-        $organiser_booking_fee = 0;
-        $total_ticket_quantity = 0;
-        $reserved = [];
-        $tickets = [];
-        $selectedSeats = json_decode($request->get('tickets'),true);
+            /*
+            * Order expires after X min
+            */
+            $order_expires_time = Carbon::now()->addMinutes(env('CHECKOUT_TIMEOUT'));
+
+            /*
+             * Remove any tickets the user has reserved
+             */
+            ReservedTickets::where('session_id', '=', $request->get('phone_id'))->delete();
+
+            $order_total = 0;
+            $booking_fee = 0;
+            $organiser_booking_fee = 0;
+            $total_ticket_quantity = 0;
+            $reserved = [];
+            $tickets = [];
+            $selectedSeats = json_decode($request->get('tickets'), true);
 //        dd($selectedSeats);
 
-        foreach ($selectedSeats as $ticket) {
-            $ticket_id = $ticket['ticket_id'];
-            $seats_count = count($ticket['seats']);
-            if($seats_count<1)
-                continue;
+            foreach ($selectedSeats as $ticket) {
+                $ticket_id = $ticket['ticket_id'];
+                $seats_count = count($ticket['seats']);
+                if ($seats_count < 1)
+                    continue;
 
-            $seat_nos = $ticket['seats'];
-            $reserved_tickets = ReservedTickets::where('ticket_id',$ticket_id)
-                ->where('expires','>',Carbon::now())
-                ->whereIn('seat_no',$seat_nos)
-                ->pluck('seat_no');
+                $seat_nos = $ticket['seats'];
+                $reserved_tickets = ReservedTickets::where('ticket_id', $ticket_id)
+                    ->where('expires', '>', Carbon::now())
+                    ->whereIn('seat_no', $seat_nos)
+                    ->pluck('seat_no');
 
-            $booked_tickets = Attendee::where('ticket_id',$ticket_id)
-                ->where('event_id',$event_id)
-                ->whereIn('seat_no',$seat_nos)
-                ->pluck('seat_no');
+                $booked_tickets = Attendee::where('ticket_id', $ticket_id)
+                    ->where('event_id', $event_id)
+                    ->whereIn('seat_no', $seat_nos)
+                    ->pluck('seat_no');
 
-            if(count($reserved_tickets)>0 || count($booked_tickets)>0)
-                return response()->json([
-                    'status'   => 'error',
-                    'messages' => 'Your selected seats are already reserved or booked please choose other seats',//todo show which are reserved
-                ]);
+                if (count($reserved_tickets) > 0 || count($booked_tickets) > 0)
+                    return response()->json([
+                        'status' => 'error',
+                        'messages' => 'Your selected seats are already reserved or booked please choose other seats',//todo show which are reserved
+                    ]);
 
-            $eventTicket = Ticket::with('event:id,organiser_fee_fixed,organiser_fee_percentage')
-                ->findOrFail($ticket_id);
+                $eventTicket = Ticket::with('event:id,organiser_fee_fixed,organiser_fee_percentage')
+                    ->findOrFail($ticket_id);
 
-            $max_per_person = min($eventTicket->quantity_remaining, $eventTicket->max_per_person);
-            /*
-             * Validation max min ticket count
-             */
-            if($seats_count < $eventTicket->min_per_person){
-                $message = 'You must select at least ' . $eventTicket->min_per_person . ' tickets.';
-            }elseif ($seats_count > $max_per_person){
-                $message = 'The maximum number of tickets you can register is ' . $max_per_person;
+                $max_per_person = min($eventTicket->quantity_remaining, $eventTicket->max_per_person);
+                /*
+                 * Validation max min ticket count
+                 */
+                if ($seats_count < $eventTicket->min_per_person) {
+                    $message = 'You must select at least ' . $eventTicket->min_per_person . ' tickets.';
+                } elseif ($seats_count > $max_per_person) {
+                    $message = 'The maximum number of tickets you can register is ' . $max_per_person;
+                }
+
+                if (isset($message)) {
+                    return response()->json([
+                        'status' => 'error',
+                        'messages' => $message,
+                    ]);
+                }
+
+                $total_ticket_quantity += $seats_count;
+                $order_total += ($seats_count * $eventTicket->price);
+                $booking_fee += ($seats_count * $eventTicket->booking_fee);
+                $organiser_booking_fee += ($seats_count * $eventTicket->organiser_booking_fee);
+                $tickets[] = [
+                    'ticket_id' => $ticket_id,
+                    'qty' => $seats_count,
+                    'seats' => $seat_nos,
+                    'price' => ($seats_count * $eventTicket->price),
+                    'booking_fee' => ($seats_count * $eventTicket->booking_fee),
+                    'organiser_booking_fee' => ($seats_count * $eventTicket->organiser_booking_fee),
+                    'full_price' => $eventTicket->price + $eventTicket->total_booking_fee,
+                ];
+
+                foreach ($seat_nos as $seat_no) {
+                    $reservedTickets = new ReservedTickets();
+                    $reservedTickets->ticket_id = $ticket_id;
+                    $reservedTickets->event_id = $event_id;
+                    $reservedTickets->quantity_reserved = 1;
+                    $reservedTickets->expires = $order_expires_time;
+                    $reservedTickets->session_id = $request->has('phone_id');
+                    $reservedTickets->seat_no = $seat_no;
+                    $reserved[] = $reservedTickets->attributesToArray();
+                }
+
             }
 
-            if (isset($message)) {
-                return response()->json([
-                    'status'   => 'error',
-                    'messages' => $message,
-                ]);
-            }
+            ReservedTickets::insert($reserved);
 
-            $total_ticket_quantity += $seats_count;
-            $order_total += ($seats_count * $eventTicket->price);
-            $booking_fee += ($seats_count * $eventTicket->booking_fee);
-            $organiser_booking_fee += ($seats_count * $eventTicket->organiser_booking_fee);
-            $tickets[] = [
-                'ticket_id'             => $ticket_id,
-                'qty'                   => $seats_count,
-                'seats'                 => $seat_nos,
-                'price'                 => ($seats_count * $eventTicket->price),
-                'booking_fee'           => ($seats_count * $eventTicket->booking_fee),
-                'organiser_booking_fee' => ($seats_count * $eventTicket->organiser_booking_fee),
-                'full_price'            => $eventTicket->price + $eventTicket->total_booking_fee,
-            ];
-
-            foreach ($seat_nos as $seat_no) {
-                $reservedTickets = new ReservedTickets();
-                $reservedTickets->ticket_id = $ticket_id;
-                $reservedTickets->event_id = $event_id;
-                $reservedTickets->quantity_reserved = 1;
-                $reservedTickets->expires = $order_expires_time;
-                $reservedTickets->session_id = $request->has('phone_id');
-                $reservedTickets->seat_no = $seat_no;
-                $reserved[] = $reservedTickets->attributesToArray();
-            }
-
-        }
-
-        ReservedTickets::insert($reserved);
-
-        return response()->json([
+            return response()->json([
 
 //            'event_id'                => $event_id,
 //            'tickets'                 => $tickets,
-            'total_ticket_quantity'   => $total_ticket_quantity,
-            'order_started'           => Carbon::now(),
-            'expires'                 => env('CHECKOUT_TIMEOUT'),
-            'order_total'             => $order_total,
-            'booking_fee'             => $booking_fee,
-            'organiser_booking_fee'   => $organiser_booking_fee,
-        ]);
+                'total_ticket_quantity' => $total_ticket_quantity,
+                'order_started' => Carbon::now(),
+                'expires' => env('CHECKOUT_TIMEOUT'),
+                'order_total' => $order_total,
+                'booking_fee' => $booking_fee,
+                'organiser_booking_fee' => $organiser_booking_fee,
+            ]);
+        }
+        catch (\Exception $ex){
+            return response()->json([
+                'status' => 'error',
+                'message' => $ex->getMessage()
+            ]);
+        }
     }
 
     public function postRegisterOrder(Request $request, $event_id,CardPayment $gateway){
@@ -254,7 +264,7 @@ class CheckoutController extends Controller
                 $order->order_date = Carbon::now();
                 $order->save();
                 $return = [
-                    'status'       => 'success',
+                    'status' => 'success',
                     'order'  => $order,
                 ];
 
