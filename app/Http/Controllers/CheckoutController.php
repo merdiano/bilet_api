@@ -156,12 +156,26 @@ class CheckoutController extends Controller
     }
 
     public function postRegisterOrder(Request $request, $event_id,CardPayment $gateway){
+
+        $validator = Validator::make($request->all(),
+            [
+                'phone_id'=>'required|string|min:8|max:45',
+                'name'=>'required|string|min:2|max:255',
+                'surname'=>'required|string|min:2|max:255',
+                'email'=>'required|email'
+            ]);
+
+        if($validator->fails()){
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Please enter correctly',
+            ]);
+        }
+
         $phone_id = $request->get('phone_id');
         $holder_name = $request->get('name');
         $holder_surname = $request->get('surname');
         $holder_email = $request->get('email');
-
-        //todo validation
 
         $event = Event::withReserved($phone_id)
             ->findOrFail($event_id,['id','organiser_fee_fixed','organiser_fee_percentage']);

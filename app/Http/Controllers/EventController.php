@@ -84,6 +84,7 @@ class EventController extends Controller
         return $request->auth->events()
             ->select('id','title','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
             ->WithViews()
+            ->with('ticket_dates')
             ->withCount(['images as image_url' => function($q){
                 $q->select(DB::raw("image_path as imgurl"))
                     ->orderBy('created_at','desc')
