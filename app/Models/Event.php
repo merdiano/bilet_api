@@ -100,7 +100,7 @@ class Event extends  Model
             $q->select('id','session_id','ticket_id','event_id','expires')
                 ->where('session_id',$phone_id )
                 ->where('expires','>',Carbon::now())
-                ->whith('ticket:id,price');
+                ->with('ticket:id,price');
         }]) ;
     }
 
