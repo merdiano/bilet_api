@@ -192,6 +192,7 @@ class CheckoutController extends Controller
 
         $event = Event::withReserved($phone_id)
             ->findOrFail($event_id,['id','organiser_fee_fixed','organiser_fee_percentage']);
+        dd($event);
 
         if(empty($event->reservedTickets) || $event->reservedTickets->count() == 0){
             return response()->json([
