@@ -191,7 +191,7 @@ class CheckoutController extends Controller
         $holder_email = $request->get('email');
 
         $event = Event::withReserved($phone_id)->with('organiser')
-            ->findOrFail($event_id,['id','organiser_fee_fixed','organiser_fee_percentage']);
+            ->findOrFail($event_id,['id','organiser_fee_fixed','organiser_fee_percentage','organiser_id']);
 
         if(empty($event->reservedTickets) || $event->reservedTickets->count() == 0){
             return response()->json([
