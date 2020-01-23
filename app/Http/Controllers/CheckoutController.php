@@ -233,14 +233,8 @@ class CheckoutController extends Controller
             'sessionTimeoutSecs' => $secondsToExpire,
             'description' => 'Order for customer: ' . $request->get('order_email'),
             'orderNumber'     => uniqid(),
-            'failUrl'     => route('showEventCheckoutPaymentReturn', [
-                'event_id'             => $event_id,
-                'is_payment_cancelled' => 1
-            ]),
-            'returnUrl' => route('showEventCheckoutPaymentReturn', [
-                'event_id'              => $event_id,
-                'is_payment_successful' => 1
-            ]),
+            'failUrl'     => 'mobile/success',
+            'returnUrl' => 'mobile/fail',
 
         ];
         try{
