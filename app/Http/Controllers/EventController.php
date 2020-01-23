@@ -23,15 +23,16 @@ class EventController extends Controller
     public function getEvent($id){
 
         //todo handle if not found
-        $event = Event::with('ticket_dates')
+        $event = Event::select(
+            "id",
+            "title",
+            "description",
+            "start_date",
+            "end_date")
+            ->with('ticket_dates')
             ->WithViews()
             ->where('id',$id)
-            ->select(
-                "id",
-                "title",
-                "description",
-                "start_date",
-                "end_date",'views')
+
             ->first();
 
 
