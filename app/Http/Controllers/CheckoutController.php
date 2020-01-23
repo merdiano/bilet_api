@@ -193,7 +193,7 @@ class CheckoutController extends Controller
         $event = Event::withReserved($phone_id)
             ->findOrFail($event_id,['id','organiser_fee_fixed','organiser_fee_percentage']);
 
-        if(empty($event->reserved_tickets) || $event->reserved_tickets->count == 0){
+        if(empty($event->reservedTickets) || $event->reservedTickets->count == 0){
             return response()->json([
                 'status'  => 'error',
                 'message' => 'Session expired',
@@ -207,7 +207,7 @@ class CheckoutController extends Controller
 
 //        DB::beginTransaction();
 
-        foreach ($event->reserved_tickets as $reserve){
+        foreach ($event->reservedTickets as $reserve){
             $order_total += $reserve->ticket->price;
             $booking_fee += $reserve->ticket->booking_fee;
             $organiser_booking_fee += $reserve->ticket->organiser_booking_fee;
@@ -223,7 +223,7 @@ class CheckoutController extends Controller
         $orderService = new OrderService($order_total, $total_booking_fee, $event);
         $orderService->calculateFinalCosts();
 
-        $secondsToExpire = Carbon::now()->diffInSeconds($event->reserved_tickets->first()->expires);
+        $secondsToExpire = Carbon::now()->diffInSeconds($event->reservedTickets->first()->expires);
 
         $transaction_data = [
             'amount'      => $orderService->getGrandTotal()*100,//multiply by 100 to obtain tenge
