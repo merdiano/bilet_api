@@ -137,7 +137,7 @@ class CheckoutController extends Controller
                     $reservedTickets->event_id = $event_id;
                     $reservedTickets->quantity_reserved = 1;
                     $reservedTickets->expires = $order_expires_time;
-                    $reservedTickets->session_id = $request->has('phone_id');
+                    $reservedTickets->session_id = $request->get('phone_id');
                     $reservedTickets->seat_no = $seat_no;
                     $reserved[] = $reservedTickets->attributesToArray();
                 }
@@ -192,7 +192,6 @@ class CheckoutController extends Controller
 
         $event = Event::withReserved($phone_id)
             ->findOrFail($event_id,['id','organiser_fee_fixed','organiser_fee_percentage']);
-        dd($event);
 
         if(empty($event->reservedTickets) || $event->reservedTickets->count() == 0){
             return response()->json([
