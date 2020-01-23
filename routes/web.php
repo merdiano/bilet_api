@@ -42,5 +42,7 @@ $router->group(
     function() use ($router) {
         $router->get('events', 'EventController@getVendorEvents');
         $router->get('event/{id}/details', 'EventController@getVendorEvent');
+        $router->get('event/{id}/attendees', 'CheckInController@getAttendees');
+        $router->post('event/{id}/checkin', 'CheckInController@checkInAttendees');
     }
 );
