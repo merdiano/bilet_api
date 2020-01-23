@@ -31,7 +31,7 @@ class EventController extends Controller
                 "title",
                 "description",
                 "start_date",
-                "end_date")
+                "end_date",'views')
             ->first();
 
 
