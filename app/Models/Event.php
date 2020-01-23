@@ -75,7 +75,15 @@ class Event extends  Model
     public function venue(){
         return $this->belongsTo(Venue::class);
     }
-
+    /**
+     * The organizer associated with the event.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function organiser()
+    {
+        return $this->belongsTo(\App\Models\Organiser::class);
+    }
     public function reservedTickets(){
         return $this->hasMany(ReservedTickets::class);
     }
