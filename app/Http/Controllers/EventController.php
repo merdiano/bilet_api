@@ -42,9 +42,7 @@ class EventController extends Controller
         }
 
         return response()->json([
-            'event' => $event->except([
-                "ticket_dates",
-            ]),
+            'event' => $event,
             'tickets' => $ticket_dates,
         ]);
     }
