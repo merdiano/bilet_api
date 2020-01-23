@@ -210,7 +210,7 @@ class CheckoutController extends Controller
         foreach ($event->reservedTickets as $reserve){
             $order_total += $reserve->ticket->price;
             $booking_fee += $reserve->ticket->booking_fee;
-            $obf = (int)ceil($this->price) === 0 ? 0 :
+            $obf = (int)ceil($reserve->ticket->price) === 0 ? 0 :
                 round($reserve->ticket->price *($event->organiser_fee_percentage / 100) + $event->organiser_fee_fixed,2);
             $organiser_booking_fee += $obf;
             $total_booking_fee += $reserve->ticket->booking_fee + $obf;
