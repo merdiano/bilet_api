@@ -97,9 +97,9 @@ class Event extends  Model
 
     public function scopeWithReserved($query,$phone_id){
         return $query->with(['reservedTickets' => function($q) use ($phone_id){
-            $q->select('id','session_id','ticket_id','event_id','expires');
+            $q->select('id','session_id','ticket_id','event_id','expires')
 //                ->where('session_id',$phone_id );
-//                ->where('expires','>',Carbon::now())
+                ->where('expires','>',Carbon::now());
 //                ->with('ticket:id,price');
         }]) ;
     }
