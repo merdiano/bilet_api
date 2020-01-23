@@ -191,7 +191,7 @@ class CheckoutController extends Controller
         $holder_email = $request->get('email');
 
         $event = Event::withReserved($phone_id)->with('organiser')
-            ->findOrFail($event_id,['id','organiser_fee_fixed','organiser_fee_percentage','organiser_id']);
+            ->findOrFail($event_id,['id','organiser_fee_fixed','organiser_fee_percentage','organiser_id','account_id']);
 
         if(empty($event->reservedTickets) || $event->reservedTickets->count() == 0){
             return response()->json([
@@ -254,7 +254,7 @@ class CheckoutController extends Controller
                 $order->booking_fee = $booking_fee;
                 $order->organiser_booking_fee = $organiser_booking_fee;
                 $order->discount = 0.00;
-                $order->account_id = $event->account->id;
+                $order->account_id = $event->account_id;
                 $order->event_id = $event_id;
                 $order->is_payment_received = 0;//false
                 $order->taxamt = $orderService->getTaxAmount();
