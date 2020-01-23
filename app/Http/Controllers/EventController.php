@@ -72,6 +72,7 @@ class EventController extends Controller
             ]);
 
         return response()->json([
+            'status' => 'success',
             'venue' => $event->venue,
             'tickets' => $tickets
         ]);
