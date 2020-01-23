@@ -206,12 +206,14 @@ class CheckoutController extends Controller
         $organiser_booking_fee = 0;
 
 //        DB::beginTransaction();
-dd($event);
+
         foreach ($event->reservedTickets as $reserve){
             $order_total += $reserve->ticket->price;
             $booking_fee += $reserve->ticket->booking_fee;
-            $organiser_booking_fee += $reserve->ticket->organiser_booking_fee;
-            $total_booking_fee += $reserve->ticket->total_booking_fee;
+            $obf = (int)ceil($this->price) === 0 ? 0 :
+                round($reserve->ticket->price *($event->organiser_fee_percentage / 100) + $event->organiser_fee_fixed,2);
+            $organiser_booking_fee += $obf;
+            $total_booking_fee += $reserve->ticket->booking_fee + $obf;
 
 //            $reserve->holder_name = $holder_name;
 //            $reserve->holder_surname = $holder_surname;
