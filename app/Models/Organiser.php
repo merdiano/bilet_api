@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Http\UploadedFile;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Str;
-use Image;
+use Illuminate\Database\Eloquent\Model;
 
-class Organiser extends MyBaseModel
+
+class Organiser extends Model
 {
 
     /**
