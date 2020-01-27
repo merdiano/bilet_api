@@ -18,7 +18,7 @@ class CheckinController extends Controller
 
         $ticket_date = $request->get('ticket_date');
         $attendess = Attendee::select('attendees.id','ticket_id','attendees.first_name','attendees.last_name','attendees.email',
-            'seat_no','reference_index','has_arrived','arrival_time','private_reference_number','order_id','orders.order_reference')
+            'seat_no','reference_index','has_arrived','arrival_time','private_reference_number','orders.order_reference')
             ->join('tickets', 'tickets.id', '=', 'attendees.ticket_id')
             ->join('orders','orders.id','=','attendees.order_id')
             ->where(function ($query) use ($event_id,$ticket_date) {
