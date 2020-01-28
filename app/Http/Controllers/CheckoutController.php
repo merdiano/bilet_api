@@ -233,6 +233,7 @@ class CheckoutController extends Controller
             'sessionTimeoutSecs' => $secondsToExpire,
             'description' => 'Order for customer: ' . $request->get('order_email'),
             'orderNumber'     => uniqid(),
+            'pageView' => 'MOBILE',
             'failUrl'     => 'mobile/success',
             'returnUrl' => 'mobile/fail',
 
@@ -264,7 +265,8 @@ class CheckoutController extends Controller
                 $order->save();
                 $return = [
                     'status' => 'success',
-                    'order'  => $order,
+//                    'order'  => $order,
+                    'payment_url'=>$response->getRedirectUrl()
                 ];
 
             } else {
