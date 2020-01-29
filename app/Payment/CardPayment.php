@@ -36,7 +36,7 @@ class CardPayment{
         $response = new PaymentRegistrationResponse();
         //dd($params);
         try{
-            $request = $this->client->post('register.do',$params);
+            $request = $this->client->post('registerPreAuth.do',$params);
             $response->setResponseData($request->getBody());
         }
         catch (\Exception $ex){
