@@ -16,7 +16,7 @@ class CheckinController extends Controller
     public function getAttendees(Request $request, $event_id){
 
         if(!$request->has('ticket_date'))
-            return response()->json(['status'=>'error','message'=>'ticket_date does not exists'],405);
+            return response()->json(['message'=>'error','message'=>'ticket_date does not exists'],400);
 
         $ticket_date = $request->get('ticket_date');
         $attendess = Attendee::select('attendees.id','ticket_id','attendees.first_name','attendees.last_name',
@@ -30,7 +30,7 @@ class CheckinController extends Controller
             })
             ->get();
 
-        return response()->json(['status'=>'error','attendees'=>$attendess]);
+        return response()->json(['message'=>'success','attendees'=>$attendess]);
     }
 
     public function checkInAttendees(Request $request, $event_id){
@@ -54,15 +54,14 @@ class CheckinController extends Controller
                 DB::commit();
 
                 return response()->json([
-                    'status'=>'success'
+                    'message'=>'success'
                 ]);
 
             }catch (\Exception $ex){
                 DB::rollBack();
                 return response()->json([
-                    'status'=>'error',
                     'message' => $ex->getMessage()
-                ]);
+                ],400);
             }
 
         }

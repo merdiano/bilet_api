@@ -67,7 +67,7 @@ class AuthController extends Controller
             // differents kind of responses. But let's return the
             // below respose for now.
             return response()->json([
-                'error' => 'Email does not exist.'
+                'message' => 'Email does not exist.'
             ], 400);
         }
 
@@ -80,7 +80,7 @@ class AuthController extends Controller
 
         // Bad Request response
         return response()->json([
-            'error' => 'Email or password is wrong.'
+            'message' => 'Email or password is wrong.'
         ], 400);
     }
 }
