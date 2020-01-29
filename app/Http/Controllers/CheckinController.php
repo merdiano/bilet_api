@@ -63,12 +63,13 @@ class CheckinController extends Controller
                 return response()->json([
                     'message' => $ex->getMessage(),
                     'attendees' => $request->get('attendees') ,
-                ],400);
+                ],200);
             }catch (\Exception $ex){
 
                 return response()->json([
-                    'message' => $ex->getMessage()
-                ],400);
+                    'message' => $ex->getMessage(),
+                    'attendees' => $request->get('attendees')
+                ],200);
             }
 
         }
