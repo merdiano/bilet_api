@@ -65,5 +65,7 @@ class CheckinController extends Controller
             }
 
         }
+        else
+            return response()->json(['message' => 'provide valid event id and attendees array'],400);
     }
 }
