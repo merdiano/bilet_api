@@ -38,11 +38,12 @@ class CheckinController extends Controller
         $event = Event::where('id',$event_id)->where('user_id',$request->auth->id)->first();
 
         if(!empty($event) && $request->has('attendees')){
+            try{
             $checks = json_decode($request->get('attendees'),true);
 //            dd($request->get('attendees'),$checks);
             $arrivals = array_column($checks, 'arrival_time', 'id');
             $att_ids = array_column($checks, 'id');
-            try{
+
                 DB::beginTransaction();
                 $attendees = Attendee::whereIn('id',$att_ids)->get();
 
@@ -57,8 +58,14 @@ class CheckinController extends Controller
                     'message'=>'success'
                 ]);
 
-            }catch (\Exception $ex){
+            }catch (\JsonException $ex){
                 DB::rollBack();
+                return response()->json([
+                    'message' => $ex->getMessage(),
+                    'attendees' => $request->get('attendees') ,
+                ],400);
+            }catch (\Exception $ex){
+
                 return response()->json([
                     'message' => $ex->getMessage()
                 ],400);
