@@ -231,7 +231,7 @@ class CheckoutController extends Controller
             'amount'      => $orderService->getGrandTotal()*100,//multiply by 100 to obtain tenge
             'currency' => 934,
             'sessionTimeoutSecs' => $secondsToExpire,
-            'description' => 'Order for customer: ' . $request->get('order_email'),
+            'description' => "Bilettm sargyt: {$holder_name} {$holder_surname}",
             'orderNumber'     => uniqid(),
 //            'pageView' => 'MOBILE',
             'failUrl'     => 'mobile/success',
