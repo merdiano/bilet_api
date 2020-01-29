@@ -233,7 +233,7 @@ class CheckoutController extends Controller
             'sessionTimeoutSecs' => $secondsToExpire,
             'description' => 'Order for customer: ' . $request->get('order_email'),
             'orderNumber'     => uniqid(),
-            'pageView' => 'MOBILE',
+//            'pageView' => 'MOBILE',
             'failUrl'     => 'mobile/success',
             'returnUrl' => 'mobile/fail',
 
