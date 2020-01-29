@@ -47,7 +47,7 @@ class CheckinController extends Controller
                 $attendees = Attendee::whereIn('id',$att_ids)->get();
 
                 foreach ($attendees as $attendee){
-                    $attendee->checked_in = true;
+                    $attendee->has_arrived = true;
                     $attendee->arrival_time = $arrivals[$attendee->id];
                     $attendee->save();
                 }
