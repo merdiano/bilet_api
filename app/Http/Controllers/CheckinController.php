@@ -39,6 +39,7 @@ class CheckinController extends Controller
 
         if(!empty($event) && $request->has('attendees')){
             $checks = json_decode($request->get('attendees'),true);
+            dd($request->get('attendees',$checks));
             $arrivals = array_column($checks, 'arrival_time', 'id');
             $att_ids = array_column($checks, 'id');
             try{
