@@ -235,8 +235,8 @@ class CheckoutController extends Controller
             'description' => "Bilettm sargyt: {$holder_name} {$holder_surname}",
             'orderNumber'     => uniqid(),
 //            'pageView' => 'MOBILE',
-            'failUrl'     => url(),
-            'returnUrl' => url(),
+            'failUrl'     => url("../e/{$event_id}/checkout/finish_mobile?is_payment_cancelled=1"),
+            'returnUrl' => url("../e/{$event_id}/checkout/finish_mobile?is_payment_successful=1"),
 
         ];
         try{
