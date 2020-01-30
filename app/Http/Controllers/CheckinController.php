@@ -76,4 +76,33 @@ class CheckinController extends Controller
         else
             return response()->json(['message' => 'provide valid event id and attendees array'],400);
     }
+
+    public function getTickets(Request $request){
+        dd(url());
+        if(!$request->has('phone_id')){
+            return response()->json(['status'=>'error','message'=>'phone_id is required'],400);
+        }
+
+        $phone_id = $request->get('phone_id');
+
+        $attendess = Attendee::select('attendees.id','ticket_id','attendees.first_name','attendees.last_name',
+            'attendees.email', 'seat_no','reference_index','has_arrived','arrival_time','orders.order_reference')
+//            ->join('orders', 'orders.id', '=', 'attendees.order_id')
+            ->join('orders','orders.id','=','attendees.order_id')
+            ->where(function ($query) use ($phone_id) {
+                $query->where('orders.session_id', $phone_id)
+                    ->where('orders.is_payment_received',1)
+                    ->where('orders.order_status_id',1)
+                    ->where('attendees.is_cancelled',0)
+                    ->where('orders.is_deleted',0)
+                    ->where('orders.is_cancelled',0)
+                    ->where('orders.is_partially_refunded',0)
+                    ->where('orders.is_refunded',0);
+            })
+            ->orderBy('attendees.id','DESC')
+            ->paginate(20);
+
+        return $attendess;
+
+    }
 }

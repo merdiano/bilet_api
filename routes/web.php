@@ -33,6 +33,8 @@ $router->group(['prefix' =>'v1'], function () use ($router){
     $router->post('event/{id}/register_order','CheckoutController@postRegisterOrder');
 
     $router->post('event/{id}/checkout','CheckoutController@postCompleteOrder');
+
+    $router->get('my_tickets','CheckinController@getTickets');
 });
 
 $router->post('auth/login', 'AuthController@authenticate');

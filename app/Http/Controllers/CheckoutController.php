@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\URL;
 
 class CheckoutController extends Controller
 {
@@ -234,8 +235,8 @@ class CheckoutController extends Controller
             'description' => "Bilettm sargyt: {$holder_name} {$holder_surname}",
             'orderNumber'     => uniqid(),
 //            'pageView' => 'MOBILE',
-            'failUrl'     => 'mobile/success',
-            'returnUrl' => 'mobile/fail',
+            'failUrl'     => url(),
+            'returnUrl' => url(),
 
         ];
         try{
