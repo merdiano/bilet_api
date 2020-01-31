@@ -19,7 +19,7 @@ class CheckinController extends Controller
             return response()->json(['message'=>'error','message'=>'ticket_date does not exists'],400);
 
         $ticket_date = $request->get('ticket_date');
-        $attendess = Attendee::select('attendees.id','ticket_id','attendees.first_name','attendees.last_name',
+        $attendess = Attendee::select('attendees.id','ticket_id','attendees.first_name','attendees.last_name','private_reference_number',
             'attendees.email', 'seat_no','reference_index','has_arrived','arrival_time','orders.order_reference')
             ->join('tickets', 'tickets.id', '=', 'attendees.ticket_id')
             ->join('orders','orders.id','=','attendees.order_id')
