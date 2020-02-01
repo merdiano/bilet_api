@@ -191,6 +191,11 @@ class CheckoutController extends Controller
         $holder_surname = $request->get('surname');
         $holder_email = $request->get('email');
 
+        //delete old uncompleted orders;
+        Order::where('session_id', $request->get('phone_id'))
+            ->where('order_status_id',5)
+            ->delete();
+
         $event = Event::withReserved($phone_id)->with('organiser')
             ->findOrFail($event_id,['id','organiser_fee_fixed','organiser_fee_percentage','organiser_id','account_id']);
 
