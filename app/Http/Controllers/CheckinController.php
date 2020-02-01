@@ -85,9 +85,8 @@ class CheckinController extends Controller
 
         $phone_id = $request->get('phone_id');
 
-        $attendess = Attendee::select('attendees.first_name','attendees.last_name','attendees.email',
-            'private_reference_number', 'seat_no','reference_index','orders.order_reference',
-            'events.title', DB::raw('venues.title as venue_name'))
+        $attendess = Attendee::select('attendees.first_name','attendees.last_name','attendees.email','events.title',
+            'private_reference_number', 'seat_no','reference_index','orders.order_reference', 'venues.venue_name')
             ->join('orders','orders.id','=','attendees.order_id')
             ->join('events','events.id','=','attendees.event_id')
             ->join('venues', 'venues.id', '=', 'events.venue_id')
