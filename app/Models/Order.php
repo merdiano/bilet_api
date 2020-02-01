@@ -3,7 +3,7 @@
 
 namespace App\Models;
 
-
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
@@ -58,7 +58,7 @@ class Order extends Model
         parent::boot();
 
         static::creating(function ($order) {
-            $order->order_reference = strtoupper(str_random(5)) . date('jn');
+            $order->order_reference = strtoupper(Str::random(5)) . date('jn');
         });
     }
 }
