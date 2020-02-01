@@ -22,8 +22,8 @@ class EventController extends Controller
 
     public function index(Request $request){
 
-        return Event::onLive($request->get('start_date'),$request->get('end_date'))
-            ->withViews()
+        return Event::select('id','title')
+            ->onLive($request->get('start_date'),$request->get('end_date'))
             ->paginate(20);
     }
 
@@ -87,6 +87,10 @@ class EventController extends Controller
 
     public function search(Request $request){
         $key = $request->get('key');
+        return Event::select('id','title')
+            ->onLive()
+            ->where('title','like',"%{$key}%")
+            ->paginate(10);
     }
 
     public function getVendorEvents(Request $request){
