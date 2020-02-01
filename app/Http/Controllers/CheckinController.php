@@ -85,10 +85,12 @@ class CheckinController extends Controller
 
         $phone_id = $request->get('phone_id');
 
-        $attendess = Attendee::select('attendees.id','ticket_id','attendees.first_name','attendees.last_name',
-            'attendees.email', 'seat_no','reference_index','has_arrived','arrival_time','orders.order_reference')
-//            ->join('orders', 'orders.id', '=', 'attendees.order_id')
+        $attendess = Attendee::select('attendees.first_name','attendees.last_name','attendees.email',
+            'private_reference_number', 'seat_no','reference_index','orders.order_reference',
+            'events.title', DB::raw('venues.title as venue_name'))
             ->join('orders','orders.id','=','attendees.order_id')
+            ->join('events','events.id','=','attendees.event_id')
+            ->join('venues', 'venues.id', '=', 'events.venue_id')
             ->where(function ($query) use ($phone_id) {
                 $query->where('orders.session_id', $phone_id)
                     ->where('orders.is_payment_received',1)
