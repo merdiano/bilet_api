@@ -16,6 +16,8 @@ $router->get('/', function () use ($router) {
 });
 
 $router->group(['prefix' =>'v1'], function () use ($router){
+    $router->get('home','EventController@index');
+
     $router->get('main','EventController@getMain');
 
     $router->get('categories[/{parent_id}]','CategoryController@get_categories');

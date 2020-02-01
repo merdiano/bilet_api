@@ -20,6 +20,13 @@ class EventController extends Controller
 
     }
 
+    public function index(Request $request){
+
+        return Event::onLive($request->get('start_date'),$request->get('end_date'))
+            ->withViews()
+            ->paginate(20);
+    }
+
     public function getEvent($id){
 
         //todo handle if not found
