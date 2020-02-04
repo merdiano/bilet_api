@@ -26,7 +26,7 @@ class JwtMiddleware
         } catch(ExpiredException $e) {
             return response()->json([
                 'message' => 'Provided token is expired.'
-            ], 400);
+            ], 401);
         } catch(Exception $e) {
             return response()->json([
                 'message' => 'An error while decoding token.'

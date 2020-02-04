@@ -22,7 +22,6 @@ $router->group(['prefix' =>'v1'], function () use ($router){
 
     $router->post('search','EventController@search');
 
-
     $router->get('categories[/{parent_id}]','CategoryController@get_categories');
 
     $router->get('category/{cat_id}/events','CategoryController@showCategoryEvents');
