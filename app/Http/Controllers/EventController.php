@@ -22,7 +22,7 @@ class EventController extends Controller
 
     public function index(Request $request){
 
-        return Event::select('id','title')
+        return Event::select('id','title_ru','title_tk')
             ->onLive($request->get('start_date'),$request->get('end_date'))
             ->paginate(20);
     }
@@ -32,8 +32,8 @@ class EventController extends Controller
         //todo handle if not found
         $event = Event::select(
             "id",
-            "title",
-            "description",
+            "description_ru",
+            "description_tk",
             "start_date",
             "end_date")
             ->with('ticket_dates')
@@ -87,15 +87,16 @@ class EventController extends Controller
 
     public function search(Request $request){
         $key = $request->get('key');
-        return Event::select('id','title')
+        return Event::select('id','title_ru','title_tk')
             ->onLive()
-            ->where('title','like',"%{$key}%")
+            ->where('title_ru','like',"%{$key}%")
+            ->orWhere('title_tk','like',"%{$key}%")
             ->paginate(10);
     }
 
     public function getVendorEvents(Request $request){
         return $request->auth->events()
-            ->select('id','title','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
+            ->select('id','title_ru','title_tk','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
             ->WithViews()
             ->with('ticket_dates')
             ->withCount(['images as image_url' => function($q){

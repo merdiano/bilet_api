@@ -42,7 +42,7 @@ class Category extends Model
         return $query->select('id','title_tk','title_ru','lft')
             ->orderBy('lft')
             ->with(['events' => function($q) use($limit){
-                $q->select('id','title','category_id')
+                $q->select('id','title_ru','title_tk','category_id')
                     ->limit($limit)
 //                    ->with('starting_ticket')
                     ->withCount(['stats as views' => function($q){
@@ -75,7 +75,7 @@ class Category extends Model
 
     public function scopeWithLiveEvents($query, $orderBy, $start_date = null,$end_date = null, $limit = 8 ){
         return $query->with(['cat_events' => function($query) use ($start_date, $end_date, $limit, $orderBy) {
-            $query->select('id','title','category_id','sub_category_id','start_date')
+            $query->select('id','title_ru','title_tk','category_id','sub_category_id','start_date')
                 ->limit($limit)
                 //->with('starting_ticket')
                 //->withCount(['stats as views' => function($q){
