@@ -97,6 +97,7 @@ class EventController extends Controller
     public function getVendorEvents(Request $request){
         return $request->auth->events()
             ->select('id','title_ru','title_tk','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
+            ->where('end_date','>',Carbon::now())
             ->WithViews()
             ->with('ticket_dates')
             ->withCount(['images as image_url' => function($q){
@@ -105,7 +106,7 @@ class EventController extends Controller
                     ->limit(1);
             }] )
             ->orderBy('id','DESC')
-            ->paginate(10);
+            ->get();
     }
 
     public function getVendorEvent(Request $request,$event_id){
