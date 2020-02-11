@@ -95,7 +95,7 @@ class EventController extends Controller
     }
 
     public function getVendorEvents(Request $request){
-        return $request->auth->events()
+         $data = $request->auth->events()
             ->select('id','title_ru','title_tk','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
             ->where('end_date','>',Carbon::now())
             ->WithViews()
@@ -107,6 +107,8 @@ class EventController extends Controller
             }] )
             ->orderBy('id','DESC')
             ->get();
+
+         return response()->json(['data'=>$data]);
     }
 
     public function getVendorEvent(Request $request,$event_id){
