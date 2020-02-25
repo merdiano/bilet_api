@@ -112,4 +112,12 @@ class Ticket extends Model
 
         return $reserved_total;
     }
+
+    public function scopeWithSection($query,$event_id,$ticket_date){
+        return $query->select('id','title','description',"price", "max_per_person", "min_per_person","start_sale_date","end_sale_date","ticket_date","section_id")
+            ->with(['section:id,section_no,description,seats,section_no_ru,description_ru,section_no_tk,description_tk','reserved:seat_no,ticket_id','booked:seat_no,ticket_id'])
+            ->where('event_id',$event_id)
+            ->where('ticket_date',$ticket_date)
+            ->orderBy('sort_order','asc');
+    }
 }

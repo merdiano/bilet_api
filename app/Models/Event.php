@@ -30,11 +30,11 @@ class Event extends  Model
      */
     public function tickets()
     {
-        return $this->hasMany(\App\Models\Ticket::class);
+        return $this->hasMany(Ticket::class);
     }
 
     public function ticket_dates(){
-        return $this->hasMany(\App\Models\Ticket::class)
+        return $this->tickets()
             ->select('ticket_date','event_id')
             ->where('is_hidden', false)
             ->where('ticket_date','>=',Carbon::now())
@@ -43,10 +43,15 @@ class Event extends  Model
             ->distinct();
     }
 
+    public function sections(){
+        return $this->hasManyThrough(Section::class,Venue::class)
+            ->where('active',1);
+    }
+
     public function starting_ticket(){
         return $this->tickets()
             ->select('id','ticket_date','event_id','price')
-            ->where('ticket_date','>=',Carbon::now(\config('app.timezone')))
+            ->where('ticket_date','>=',Carbon::now())
             ->orderBy('ticket_date')
             ->orderBy('price')
             ->limit(2); // limit 1 returns null ???
@@ -58,7 +63,7 @@ class Event extends  Model
      */
     public function stats()
     {
-        return $this->hasMany(\App\Models\EventStats::class);
+        return $this->hasMany(EventStats::class);
     }
 
     public function views(){
