@@ -44,7 +44,7 @@ class Event extends  Model
     }
 
     public function sections(){
-        return $this->hasManyThrough(Section::class,Venue::class)
+        return $this->hasManyThrough(Section::class,Ticket::class)
             ->where('active',1);
     }
 
