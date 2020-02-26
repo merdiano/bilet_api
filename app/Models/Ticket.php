@@ -45,8 +45,9 @@ class Ticket extends Model
      */
     public function getBookingFeeAttribute()
     {
+        $fees = Setting::booking_fees();
         return (int)ceil($this->price) === 0 ? 0 : round(
-            ($this->price * (env('ticket_booking_fee_percentage') / 100)) + (env('ticket_booking_fee_fixed')),
+            ($this->price * ($fees['booking_fee_percentage'] ?? 0 / 100)) + ($fees['booking_fee_fixed'] ?? 0),
             2
         );
     }
