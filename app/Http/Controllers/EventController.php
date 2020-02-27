@@ -36,7 +36,7 @@ class EventController extends Controller
             "description_tk",
             "start_date",
             "end_date","venue_id")
-            ->with(['ticket_dates','venue'])
+            ->with(['ticket_dates','venue:id,venue_name_tk,venue_name_ru,address'])
             ->WithViews()
             ->where('id',$id)
 
