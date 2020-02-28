@@ -39,12 +39,11 @@ class CheckinController extends Controller
 
         $ticket_date = $request->get('ticket_date');
 
-        $tickets = Ticket::select('id','section_id')
+        $tickets = Ticket::select('id','section_id','event_id')
             ->with(['section','booked' => function($q){
             $q ->select('id','order_id','first_name','last_name', 'private_reference_number', 'email', 'seat_no',
                 'reference_index','has_arrived','arrival_time')
-                ->with(['order: id, order_reference'])
-                ->where('is_cancelled', false);
+                ->with(['order: id, order_reference']);
             }])
             ->where('event_id',$event_id)
             ->where('ticket_date',$ticket_date)
