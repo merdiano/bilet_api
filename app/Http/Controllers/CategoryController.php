@@ -25,7 +25,7 @@ class CategoryController extends Controller
     public function showCategoryEvents($cat_id, Request $request){
 
         [$order, $data] = $this->sorts_filters($request);
-//        $data['category'] = $category;
+
         $data['sub_cats'] = Category::where('parent_id',$cat_id)
             ->select('id','title_ru','title_tk','parent_id','lft')
             ->orderBy('lft')
@@ -34,7 +34,6 @@ class CategoryController extends Controller
                 function ($query) use($data){
                     $query->onLive($data['start'], $data['end']);
                 })->get();
-
 
         return response()->json($data);
     }
