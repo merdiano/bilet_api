@@ -37,7 +37,6 @@ class Ticket extends Model
         return $this->hasMany(Attendee::class)
             ->orderBy('seat_no','asc');
     }
-
     /**
      * Get the booking fee of the ticket.
      *
