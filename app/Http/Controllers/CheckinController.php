@@ -43,7 +43,7 @@ class CheckinController extends Controller
             ->with(['section','booked' => function($q){
             $q ->select('id','order_id','first_name','last_name', 'private_reference_number', 'email', 'seat_no',
                 'reference_index','has_arrived','arrival_time')
-                ->with(['order: id, order_reference']);
+                ->with(['order: order_reference']);
             }])
             ->where('event_id',$event_id)
             ->where('ticket_date',$ticket_date)
