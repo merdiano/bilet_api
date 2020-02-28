@@ -50,7 +50,9 @@ $router->group(
 
         $router->get('event/{id}/details', 'EventController@getVendorEvent');
 
-        $router->get('event/{id}/attendees', 'CheckinController@getTicketsAttendees');
+        $router->get('event/{id}/attendees', 'CheckinController@getAttendees');
+
+        $router->get('event/{id}/ticket_attendees', 'CheckinController@getTicketsAttendees');
 
         $router->post('event/{id}/checkin', 'CheckinController@checkInAttendees');
     }
