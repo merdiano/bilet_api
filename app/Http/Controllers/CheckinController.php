@@ -33,6 +33,24 @@ class CheckinController extends Controller
         return response()->json(['message'=>'success','attendees'=>$attendess]);
     }
 
+    public function getTicketsAttendees(Request $request, $event_id){
+        if(!$request->has('ticket_date'))
+            return response()->json(['message'=>'error','message'=>'ticket_date does not exists'],400);
+
+        $ticket_date = $request->get('ticket_date');
+
+        $tickets = Ticket::select('id','section_id')
+            ->with(['section','attendees' => function($q){
+            $q ->select('id','order_id','first_name','last_name', 'private_reference_number', 'email', 'seat_no',
+                'reference_index','has_arrived','arrival_time')
+                ->with(['order: id, order_reference'])
+                ->where('is_canccelled', false);
+            }])
+            ->where('event_id',$event_id)
+            ->where('tickets.ticket_date',$ticket_date)
+            ->get();
+    }
+
     public function checkInAttendees(Request $request, $event_id){
 
         $event = Event::where('id',$event_id)->where('user_id',$request->auth->id)->first();
