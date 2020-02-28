@@ -57,3 +57,7 @@ $router->group(
         $router->post('event/{id}/checkin', 'CheckinController@checkInAttendees');
     }
 );
+
+/** CATCH-ALL ROUTE for Backpack/PageManager - needs to be at the end of your routes.php file  **/
+$router->get('{page}/{subs?}', ['uses' => '\App\Http\Controllers\PageController@index','as'=>'about'])
+    ->where(['page' => '^(((?=(?!admin))(?=(?!\/)).))*$', 'subs' => '.*']);
