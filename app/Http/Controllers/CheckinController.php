@@ -47,8 +47,10 @@ class CheckinController extends Controller
                 ->where('is_canccelled', false);
             }])
             ->where('event_id',$event_id)
-            ->where('tickets.ticket_date',$ticket_date)
+            ->where('ticket_date',$ticket_date)
             ->get();
+
+        return response()->json(['message'=>'success','tickets' => $tickets]);
     }
 
     public function checkInAttendees(Request $request, $event_id){
