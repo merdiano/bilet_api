@@ -61,7 +61,7 @@ class CategoryController extends Controller
         [$order, $data] = $this->sorts_filters($request);
 
         return Event::where('sub_category_id',$cat_id)
-            ->select('id','title')
+            ->select('id','title_ru','title_tk')
             ->onLive($data['start'],$data['end'])
             ->orderBy($order['field'],$order['order'])
             ->paginate();
