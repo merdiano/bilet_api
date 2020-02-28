@@ -59,4 +59,4 @@ $router->group(
 );
 
 /** CATCH-ALL ROUTE for Backpack/PageManager - needs to be at the end of your routes.php file  **/
-$router->get('page/{page}', 'PageController@index');
+$router->get('page/{slug}', 'PageController@index');

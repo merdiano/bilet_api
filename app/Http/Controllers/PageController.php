@@ -8,7 +8,7 @@ use App\Models\Page;
 
 class PageController extends Controller
 {
-    public function index($slug, $subs = null)
+    public function index($slug)
     {
         $page = Page::findBySlug($slug);
 
