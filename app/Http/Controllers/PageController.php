@@ -18,7 +18,7 @@ class PageController extends Controller
         }
 
 
-        return response()->json(['page' => $page]);
+        return response()->json($page);
     }
 
 }
