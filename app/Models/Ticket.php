@@ -35,7 +35,6 @@ class Ticket extends Model
 
     public function booked(){
         return $this->hasMany(Attendee::class)
-            ->where('attendees.is_cancelled',false)
             ->orderBy('attendees.seat_no','asc');
     }
     /**
