@@ -41,7 +41,7 @@ class CheckinController extends Controller
 
         $tickets = Ticket::select('id','section_id','event_id')
             ->with(['section','booked' => function($q){
-            $q ->select('id','order_id','first_name','last_name', 'private_reference_number', 'email', 'seat_no',
+            $q ->select('attendees.id','order_id','attendees.first_name','attendees.last_name', 'private_reference_number', 'attendees.email', 'seat_no',
                 'reference_index','has_arrived','arrival_time','orders.order_reference')
                 ->join('orders','orders.id','=','attendees.order_id');
             }])
