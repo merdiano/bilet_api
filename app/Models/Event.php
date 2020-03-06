@@ -23,6 +23,9 @@ class Event extends  Model
         return $this->hasMany(\App\Models\EventImage::class);
     }
 
+    public function attendees(){
+        return $this->hasMany(Attendee::class);
+    }
     /**
      * The tickets associated with the event.
      *
