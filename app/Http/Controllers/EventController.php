@@ -96,6 +96,9 @@ class EventController extends Controller
             ->select('id','title_ru','title_tk','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
             ->where('end_date','>',Carbon::now())
             ->WithViews()
+             ->withCount(['attendees as sold_count' => function($q){
+                 $q->where('is_cancelled',false);
+             }])
             ->with('ticket_dates')
             ->withCount(['images as image_url' => function($q){
                 $q->select(DB::raw("image_path as imgurl"))
