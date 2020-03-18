@@ -93,20 +93,20 @@ class EventController extends Controller
 
     public function getVendorEvents(Request $request){
          $data = $request->auth->events()
-            ->select('id','title_ru','title_tk','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
-            ->where('end_date','>',Carbon::now())
-            ->WithViews()
+             ->select('id','title_ru','title_tk','start_date','end_date',"sales_volume","organiser_fees_volume","is_live")
+             ->where('end_date','>',Carbon::now())
+             ->WithViews()
              ->withCount(['attendees as sold_count' => function($q){
                  $q->where('is_cancelled',false);
              }])
-            ->with('ticket_dates')
-            ->withCount(['images as image_url' => function($q){
-                $q->select(DB::raw("image_path as imgurl"))
-                    ->orderBy('created_at','desc')
-                    ->limit(1);
+             ->with('ticket_dates')
+             ->withCount(['images as image_url' => function($q){
+                 $q->select(DB::raw("image_path as imgurl"))
+                     ->orderBy('created_at','desc')
+                     ->limit(1);
             }] )
-            ->orderBy('id','DESC')
-            ->get();
+             ->orderBy('id','DESC')
+             ->get();
 
          return response()->json(['data'=>$data]);
     }
