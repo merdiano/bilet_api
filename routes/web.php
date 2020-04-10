@@ -58,7 +58,7 @@ $router->group(
 
         $router->post('event/{id}/checkin', 'CheckinController@checkInAttendees');
 
-        $router->post('event/{id}/book', 'CheckinController@ofline_book');
+        $router->post('event/{id}/book', 'CheckoutController@ofline_book');
     }
 );
 
