@@ -57,6 +57,8 @@ $router->group(
         $router->get('event/{id}/ticket_attendees', 'CheckinController@getTicketsAttendees');
 
         $router->post('event/{id}/checkin', 'CheckinController@checkInAttendees');
+
+        $router->post('event/{id}/book', 'CheckinController@ofline_book');
     }
 );
 
