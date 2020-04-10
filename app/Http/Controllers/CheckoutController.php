@@ -493,7 +493,7 @@ class CheckoutController extends Controller
 
             return response()->json([
                 'status'  => 'error',
-                'message' => 'Whoops! There was a problem processing your order. Please try again.'
+                'message' => $ex->getMessage()
             ]);
         }
 
