@@ -460,10 +460,28 @@ class CheckoutController extends Controller
 //        $order->transaction_id = $response->getPaymentReferenceId();
             $order->order_date = Carbon::now();
             $order->save();
+
             foreach ($tickets as $ticket){
                 /*
                  * Create the attendees
                  */
+                $attendee = Attendee::select('id')
+                    ->where('ticekt_id',$ticket['id'])
+                    ->where('event_id',$event_id)
+                    ->where('is_cancelled',false)
+                    ->whereIn('seat_no', $ticket['seats'])
+                    ->count();
+
+                if($attendee){
+                    DB::rollBack();
+                    return response()->json([
+                        'status'  => 'error',
+                        'message' => 'Seats are already booked'
+                    ]);
+                }
+
+                //todo handle reserved also;
+
                 foreach ($ticket['seats'] as $key => $seat){
                     $attendee = new Attendee();
                     $attendee->first_name = $order->first_name;
