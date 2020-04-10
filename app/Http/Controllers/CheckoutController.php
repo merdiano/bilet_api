@@ -431,7 +431,7 @@ class CheckoutController extends Controller
 
     public function offline_book(Request $request, $event_id){
         $event = Event::findOrfail($event_id,['id','account_id']);
-        dd($event);
+
         if(!$request->has('tickets')){
             return response()->json([
                 'status'  => 'error',
@@ -440,7 +440,7 @@ class CheckoutController extends Controller
         }
 
         $tickets = json_decode($request->get('tickets'),true);
-
+        dd($tickets);
         DB::beginTransaction();
         try{
             $order = new Order();
