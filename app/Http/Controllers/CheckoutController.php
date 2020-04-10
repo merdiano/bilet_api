@@ -431,7 +431,7 @@ class CheckoutController extends Controller
 
     public function offline_book(Request $request, $event_id){
         $event = Event::findOrfail($event_id,['id','account_id']);
-
+        dd($event);
         if(!$request->has('tickets')){
             return response()->json([
                 'status'  => 'error',
@@ -459,7 +459,7 @@ class CheckoutController extends Controller
 //        $order->session_id = $phone_id;
 //        $order->transaction_id = $response->getPaymentReferenceId();
             $order->order_date = Carbon::now();
-            dd($order);
+
             $order->save();
 
             foreach ($tickets as $ticket){
