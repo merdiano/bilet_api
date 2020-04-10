@@ -16,6 +16,7 @@ use App\Payment\CardPayment;
 use App\Services\Order as OrderService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\URL;
@@ -446,7 +447,7 @@ class CheckoutController extends Controller
             $order = new Order();
             $order->first_name = 'kassa';
             $order->last_name = 'kassa';
-            $order->email = 'kassa@ofline.com';
+            $order->email = Auth::user()->email;
             $order->order_status_id = 5;//order awaiting payment
 //        $order->amount = $order_total;
 //        $order->booking_fee = $booking_fee;
@@ -469,7 +470,7 @@ class CheckoutController extends Controller
                     ->where('ticekt_id',$ticket['id'])
                     ->where('event_id',$event_id)
                     ->where('is_cancelled',false)
-                    ->whereIn('seat_no', $ticket['seats'])
+                    ->whereIn('seat_no', array_values($ticket['seats']))
                     ->count();
 
                 if($attendee){
@@ -520,7 +521,9 @@ class CheckoutController extends Controller
             $attendee = Attendee::update(['is_cancelled'=>true])
                 ->where('event_id',$event_id)
                 ->where('ticket_id',$request->get('ticket_id'))
-                ->wherer('seat_no',$request->get('seat_no'));
+                ->where('email',Auth::user()->email)
+                ->where('seat_no',$request->get('seat_no'));
+
             if($attendee)
                 return response()->json([
                     'status'  => 'success',
@@ -530,7 +533,7 @@ class CheckoutController extends Controller
 
         return response()->json([
             'status'  => 'error',
-            'message' => 'Cancell unsuccessful'
+            'message' => 'Cancel unsuccessful'
         ]);
 
     }
