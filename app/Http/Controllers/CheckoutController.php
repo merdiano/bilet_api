@@ -440,7 +440,6 @@ class CheckoutController extends Controller
         }
 
         $tickets = json_decode($request->get('tickets'),true);
-        dd($tickets);
 
         DB::beginTransaction();
         try{
@@ -461,12 +460,11 @@ class CheckoutController extends Controller
 //        $order->transaction_id = $response->getPaymentReferenceId();
             $order->order_date = Carbon::now();
             $order->save();
-            $attendee_increment = 1;
             foreach ($tickets as $ticket){
                 /*
                  * Create the attendees
                  */
-                foreach ($ticket['seats'] as $seat){
+                foreach ($ticket['seats'] as $key => $seat){
                     $attendee = new Attendee();
                     $attendee->first_name = $order->first_name;
                     $attendee->last_name = $order->last_name;
@@ -475,10 +473,9 @@ class CheckoutController extends Controller
                     $attendee->order_id = $order->id;
                     $attendee->ticket_id = $ticket['id'];
                     $attendee->account_id = $event->account_id;
-                    $attendee->reference_index = $attendee_increment;
+                    $attendee->reference_index = $key + 1;
                     $attendee->seat_no = $seat;
                     $attendee->save();
-                    $attendee_increment++;
                 }
 
             }
