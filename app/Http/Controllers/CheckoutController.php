@@ -430,7 +430,7 @@ class CheckoutController extends Controller
     }
 
     public function offline_book(Request $request, $event_id){
-        $event = Event::findOrfail($event_id);
+        $event = Event::findOrfail($event_id,['id','account_id']);
 
         if(!$request->has('tickets')){
             return response()->json([
@@ -440,6 +440,7 @@ class CheckoutController extends Controller
         }
 
         $tickets = json_decode($request->get('tickets'),true);
+        dd($tickets);
 
         DB::beginTransaction();
         try{
@@ -461,26 +462,26 @@ class CheckoutController extends Controller
             $order->order_date = Carbon::now();
             $order->save();
             $attendee_increment = 1;
-//            foreach ($tickets as $ticket){
-//                /*
-//                 * Create the attendees
-//                 */
-//                foreach ($ticket['seats'] as $seat){
-//                    $attendee = new Attendee();
-//                    $attendee->first_name = $order->first_name;
-//                    $attendee->last_name = $order->last_name;
-//                    $attendee->email = $order->email;
-//                    $attendee->event_id = $event_id;
-//                    $attendee->order_id = $order->id;
-//                    $attendee->ticket_id = $ticket['id'];
-//                    $attendee->account_id = $event->account->id;
-//                    $attendee->reference_index = $attendee_increment;
-//                    $attendee->seat_no = $seat;
-//                    $attendee->save();
-//                    $attendee_increment++;
-//                }
-//
-//            }
+            foreach ($tickets as $ticket){
+                /*
+                 * Create the attendees
+                 */
+                foreach ($ticket['seats'] as $seat){
+                    $attendee = new Attendee();
+                    $attendee->first_name = $order->first_name;
+                    $attendee->last_name = $order->last_name;
+                    $attendee->email = $order->email;
+                    $attendee->event_id = $event_id;
+                    $attendee->order_id = $order->id;
+                    $attendee->ticket_id = $ticket['id'];
+                    $attendee->account_id = $event->account_id;
+                    $attendee->reference_index = $attendee_increment;
+                    $attendee->seat_no = $seat;
+                    $attendee->save();
+                    $attendee_increment++;
+                }
+
+            }
             DB::commit();
             return response()->json([
                 'status'  => 'success',
