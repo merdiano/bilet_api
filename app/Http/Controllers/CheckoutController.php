@@ -466,11 +466,12 @@ class CheckoutController extends Controller
                 /*
                  * Create the attendees
                  */
-                $attendee_count = Attendee::where('ticket_id',$ticket['id'])
-                    ->where('event_id',$event_id)
-                    ->where('is_cancelled',false)
+                $attendee_count = Attendee::
+//                ->where('ticket_id',$ticket['id'])
+//                    ->where('event_id',$event_id)
+//                    ->where('is_cancelled',false)
 //                    ->whereIn('seat_no', array_values($ticket['seats']))
-                    ->count();
+                    count();
 
                 dd($attendee_count);
 
