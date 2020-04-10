@@ -444,10 +444,9 @@ class CheckoutController extends Controller
         DB::beginTransaction();
         try{
             $order = new Order();
-            dd($request->auth->email);
             $order->first_name = 'kassa';
             $order->last_name = 'kassa';
-            $order->email = Auth::user()->email;
+            $order->email = $request->auth->email;
             $order->order_status_id = 5;//order awaiting payment
 //        $order->amount = $order_total;
 //        $order->booking_fee = $booking_fee;
@@ -521,7 +520,7 @@ class CheckoutController extends Controller
             $attendee = Attendee::update(['is_cancelled'=>true])
                 ->where('event_id',$event_id)
                 ->where('ticket_id',$request->get('ticket_id'))
-                ->where('email',Auth::user()->email)
+                ->where('email',$request->auth->email)
                 ->where('seat_no',$request->get('seat_no'));
 
             if($attendee)
