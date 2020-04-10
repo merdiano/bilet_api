@@ -9,7 +9,6 @@ use App\Models\Event;
 use App\Models\EventStats;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\QuestionAnswer;
 use App\Models\ReservedTickets;
 use App\Models\Ticket;
 use App\Payment\CardPayment;
@@ -20,7 +19,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\URL;
 
 class CheckoutController extends Controller
 {
@@ -461,6 +459,7 @@ class CheckoutController extends Controller
 //        $order->session_id = $phone_id;
 //        $order->transaction_id = $response->getPaymentReferenceId();
             $order->order_date = Carbon::now();
+            dd($order);
             $order->save();
 
             foreach ($tickets as $ticket){
