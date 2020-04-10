@@ -18,6 +18,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\URL;
 
@@ -466,15 +467,11 @@ class CheckoutController extends Controller
                 /*
                  * Create the attendees
                  */
-                dd($ticket);
-                $attendee_count = Attendee::
-//                ->where('ticket_id',$ticket['id'])
-//                    ->where('event_id',$event_id)
-//                    ->where('is_cancelled',false)
-//                    ->whereIn('seat_no', array_values($ticket['seats']))
-                    count();
-
-//                dd($attendee_count);
+                $attendee_count = Attendee::where('ticket_id',$ticket['id'])
+                    ->where('event_id',$event_id)
+                    ->where('is_cancelled',false)
+                    ->whereIn('seat_no', array_values($ticket['seats']))
+                    ->count();
 
                 if($attendee_count > 0){
                     DB::rollBack();
