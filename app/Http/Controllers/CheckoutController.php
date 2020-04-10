@@ -440,10 +440,11 @@ class CheckoutController extends Controller
         }
 
         $tickets = json_decode($request->get('tickets'),true);
-        dd($tickets);
+
         DB::beginTransaction();
         try{
             $order = new Order();
+            dd(Auth::user());
             $order->first_name = 'kassa';
             $order->last_name = 'kassa';
             $order->email = Auth::user()->email;
