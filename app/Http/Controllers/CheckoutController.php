@@ -444,7 +444,7 @@ class CheckoutController extends Controller
         DB::beginTransaction();
         try{
             $order = new Order();
-            dd(Auth::user());
+            dd($request->user()->email);
             $order->first_name = 'kassa';
             $order->last_name = 'kassa';
             $order->email = Auth::user()->email;
