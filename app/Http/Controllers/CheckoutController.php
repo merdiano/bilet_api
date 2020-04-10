@@ -62,9 +62,12 @@ class CheckoutController extends Controller
             $order_expires_time = Carbon::now()->addMinutes(env('CHECKOUT_TIMEOUT'));
 
             /*
-             * Remove any tickets the user has reserved
+             * Remove any tickets the user has reserved if it does not belong to order expecting payment
              */
-            ReservedTickets::where('session_id', '=', $request->get('phone_id'))->delete();
+            ReservedTickets::where('session_id',$request->get('phone_id'))
+                ->whereNull('expects_payment_at')
+                ->orWhere('expects_payment_at','<',Carbon::now()->addMinutes(-5))
+                ->delete();
 
             $order_total = 0;
             $booking_fee = 0;
@@ -73,7 +76,6 @@ class CheckoutController extends Controller
             $reserved = [];
             $tickets = [];
             $selectedSeats = json_decode($request->get('tickets'), true);
-//        dd($selectedSeats);
 
             foreach ($selectedSeats as $ticket) {
                 $ticket_id = $ticket['ticket_id'];
@@ -419,9 +421,81 @@ class CheckoutController extends Controller
         /*
          * Remove any tickets the user has reserved after they have been ordered for the user
          */
-        ReservedTickets::where('session_id', $request->get('phone_id'))->delete();
+        ReservedTickets::where('session_id', $request->get('phone_id'))
+            ->whereNull('expects_payment_at')
+            ->orWhere('expects_payment_at','<',Carbon::now()->addMinutes(-5))
+            ->delete();
 
         //todo fire event
     }
 
+    public function offline_book(Request $request, $event_id){
+        $event = Event::findOrfail($event_id);
+
+        if(!$request->has('tickets')){
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'No tickets.'
+            ]);
+        }
+
+        $tickets = json_decode($request->get('tickets'),true);
+
+        DB::beginTransaction();
+        try{
+            $order = new Order();
+            $order->first_name = 'kassa';
+            $order->last_name = 'kassa';
+            $order->email = 'kassa@ofline.com';
+            $order->order_status_id = 5;//order awaiting payment
+//        $order->amount = $order_total;
+//        $order->booking_fee = $booking_fee;
+//        $order->organiser_booking_fee = $organiser_booking_fee;
+            $order->discount = 0.00;
+            $order->account_id = $event->account_id;
+            $order->event_id = $event_id;
+            $order->is_payment_received = 0;//false
+//        $order->taxamt = $orderService->getTaxAmount();
+//        $order->session_id = $phone_id;
+//        $order->transaction_id = $response->getPaymentReferenceId();
+            $order->order_date = Carbon::now();
+            $order->save();
+            $attendee_increment = 1;
+            foreach ($tickets as $ticket){
+                /*
+                 * Create the attendees
+                 */
+                foreach ($ticket['seats'] as $seat){
+                    $attendee = new Attendee();
+                    $attendee->first_name = $order->first_name;
+                    $attendee->last_name = $order->last_name;
+                    $attendee->email = $order->email;
+                    $attendee->event_id = $event_id;
+                    $attendee->order_id = $order->id;
+                    $attendee->ticket_id = $ticket['id'];
+                    $attendee->account_id = $event->account->id;
+                    $attendee->reference_index = $attendee_increment;
+                    $attendee->seat_no = $seat;
+                    $attendee->save();
+                    $attendee_increment++;
+                }
+
+            }
+            DB::commit();
+            return response()->json([
+                'status'  => 'success',
+                'message' => 'Reservation Completed',
+            ]);
+        }
+        catch (\Exception $ex){
+            Log::error($ex);
+            DB::rollBack();
+
+            return response()->json([
+                'status'  => 'error',
+                'message' => 'Whoops! There was a problem processing your order. Please try again.'
+            ]);
+        }
+
+    }
 }
