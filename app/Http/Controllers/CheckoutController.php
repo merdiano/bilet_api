@@ -514,4 +514,24 @@ class CheckoutController extends Controller
         }
 
     }
+
+    public function offline_cancel(Request $request,$event_id){
+        if($request->has('ticket_id') && $request->has('seat_no')){
+            $attendee = Attendee::update(['is_cancelled'=>true])
+                ->where('event_id',$event_id)
+                ->where('ticket_id',$request->get('ticket_id'))
+                ->wherer('seat_no',$request->get('seat_no'));
+            if($attendee)
+                return response()->json([
+                    'status'  => 'success',
+                    'message' => 'Reservation cancelled',
+                ]);
+        }
+
+        return response()->json([
+            'status'  => 'error',
+            'message' => 'Cancell unsuccessful'
+        ]);
+
+    }
 }
