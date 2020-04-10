@@ -466,14 +466,15 @@ class CheckoutController extends Controller
                 /*
                  * Create the attendees
                  */
-                $attendee = Attendee::select('id')
-                    ->where('ticekt_id',$ticket['id'])
+                $attendee_count = Attendee::where('ticket_id',$ticket['id'])
                     ->where('event_id',$event_id)
                     ->where('is_cancelled',false)
                     ->whereIn('seat_no', array_values($ticket['seats']))
                     ->count();
 
-                if($attendee){
+                dd($attendee_count);
+
+                if($attendee_count > 0){
                     DB::rollBack();
                     return response()->json([
                         'status'  => 'error',
