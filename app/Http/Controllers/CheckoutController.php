@@ -152,7 +152,7 @@ class CheckoutController extends Controller
             return response()->json([
                 'status' => 'success',
 //            'event_id'                => $event_id,
-//            'tickets'                 => $tickets,
+                'tickets'                 => $tickets,
                 'total_ticket_quantity' => $total_ticket_quantity,
                 'order_started' => Carbon::now(),
                 'expires' => env('CHECKOUT_TIMEOUT'),
