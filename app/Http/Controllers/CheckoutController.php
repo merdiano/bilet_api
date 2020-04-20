@@ -121,17 +121,16 @@ class CheckoutController extends Controller
                 }
 
                 $total_ticket_quantity += $seats_count;
-                $order_total += ($seats_count * $eventTicket->price);
-                $booking_fee += ($seats_count * $eventTicket->booking_fee);
-                $organiser_booking_fee += ($seats_count * $eventTicket->organiser_booking_fee);
+                $order_total += number_format($seats_count * $eventTicket->price,2);
+                $booking_fee += number_format($seats_count * $eventTicket->booking_fee,2);
+                $organiser_booking_fee += number_format($seats_count * $eventTicket->organiser_booking_fee,2);
                 $tickets[] = [
-                    'ticket_id' => $ticket_id,
+                    'ticket' => $eventTicket->title,
                     'qty' => $seats_count,
-                    'seats' => $seat_nos,
-                    'price' => ($seats_count * $eventTicket->price),
-                    'booking_fee' => ($seats_count * $eventTicket->booking_fee),
-                    'organiser_booking_fee' => ($seats_count * $eventTicket->organiser_booking_fee),
-                    'full_price' => $eventTicket->price + $eventTicket->total_booking_fee,
+                    'price' => $eventTicket->price,
+//                    'ticket_booking_fee' => ($seats_count * $eventTicket->booking_fee),
+//                    'organiser_booking_fee' => ($seats_count * $eventTicket->organiser_booking_fee),
+//                    'full_price' => $eventTicket->price + $eventTicket->total_booking_fee,
                 ];
 
                 foreach ($seat_nos as $seat_no) {
@@ -153,12 +152,11 @@ class CheckoutController extends Controller
                 'status' => 'success',
 //            'event_id'                => $event_id,
                 'tickets'                 => $tickets,
-                'total_ticket_quantity' => $total_ticket_quantity,
                 'order_started' => Carbon::now(),
                 'expires' => env('CHECKOUT_TIMEOUT'),
                 'order_total' => $order_total,
-                'booking_fee' => $booking_fee,
-                'organiser_booking_fee' => $organiser_booking_fee,
+                'total_booking_fee' => $booking_fee + $organiser_booking_fee,
+//                'organiser_booking_fee' => $organiser_booking_fee,
             ]);
         }
         catch (\Exception $ex){
