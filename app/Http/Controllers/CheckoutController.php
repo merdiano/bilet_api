@@ -127,7 +127,7 @@ class CheckoutController extends Controller
                 $tickets[] = [
                     'ticket' => $eventTicket->title,
                     'qty' => $seats_count,
-                    'price' => $eventTicket->price,
+                    'price' => number_format($eventTicket->price,2),
 //                    'ticket_booking_fee' => ($seats_count * $eventTicket->booking_fee),
 //                    'organiser_booking_fee' => ($seats_count * $eventTicket->organiser_booking_fee),
 //                    'full_price' => $eventTicket->price + $eventTicket->total_booking_fee,
